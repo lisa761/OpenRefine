@@ -73,6 +73,7 @@ public class Column  {
             String originalName) {
         _cellIndex = cellIndex;
         _originalName = _name = originalName;
+        System.out.print("COLUMN.JAVA");
     }
     
     @JsonProperty("cellIndex")
