@@ -41,6 +41,11 @@ package com.google.refine.model;
  *
  */
 public interface OverlayModel  {
+
+	static void output() {
+        System.out.println("OVERLAYMODEL.JAVA");
+    }
+
     public void onBeforeSave(Project project);
     
     public void onAfterSave(Project project);

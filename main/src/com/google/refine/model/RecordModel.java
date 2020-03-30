@@ -56,6 +56,7 @@ public class RecordModel  {
         public CellDependency(int rowIndex, int cellIndex) {
             this.rowIndex = rowIndex;
             this.cellIndex = cellIndex;
+            System.out.print("RECORDMODEL.JAVA");
         }
         
         @Override

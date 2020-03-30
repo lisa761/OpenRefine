@@ -30,14 +30,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
-
+console.log("data-table-view.js");
 function DataTableView(div) {
   this._div = div;
 
   this._gridPagesSizes = JSON.parse(Refine.getPreference("ui.gridPaginationSize", null));
   this._gridPagesSizes = this._checkPaginationSize(this._gridPagesSizes, [ 5, 10, 25, 50 ]);
-  this._pageSize = ( this._gridPagesSizes[0] < 10 ) ? 10 : this._gridPagesSizes[0];
+  // this._pageSize = ( this._gridPagesSizes[0] < 10 ) ? 10 : this._gridPagesSizes[0];
 
+  this._pageSize = 201;
   this._showRecon = true;
   this._collapsedColumnNames = {};
   this._sorting = { criteria: [] };
@@ -393,6 +394,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
    */
 
   var rows = theProject.rowModel.rows;
+  console.log(JSON.stringify(theProject));
   var renderRow = function(tr, r, row, even) {
     $(tr).empty();
     var cells = row.cells;
@@ -443,11 +445,13 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       if ("j" in row) {
         $(tr).addClass("record");
         $('<div></div>').html((row.j + 1) + ".").appendTo(tdIndex);
+        console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
       } else {
         $('<div></div>').html("&nbsp;").appendTo(tdIndex);
       }
     } else {
       $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
+      console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     }
 
     $(tr).addClass(even ? "even" : "odd");

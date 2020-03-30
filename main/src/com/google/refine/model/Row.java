@@ -67,6 +67,7 @@ public class Row implements HasFields {
      */
     public Row(int cellCount) {
         cells = new ArrayList<Cell>(cellCount);
+        System.out.println("ROW.JAVA");
     }
     
     protected Row(List<Cell> cells, boolean flagged, boolean starred) {
