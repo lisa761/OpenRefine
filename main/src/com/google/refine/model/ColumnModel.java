@@ -50,7 +50,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class ColumnModel  {
     @JsonProperty("columns")
     final public List<Column>      columns = new LinkedList<Column>();
@@ -67,6 +66,7 @@ public class ColumnModel  {
     
     public ColumnModel() {
         internalInitialize();
+        System.out.print("COLUMNMODEL.JAVA");
     }
     
     synchronized public void setMaxCellIndex(int maxCellIndex) {
