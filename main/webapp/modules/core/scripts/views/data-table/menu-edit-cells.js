@@ -308,6 +308,9 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
     elmts.or_views_numberExample.text($.i18n('core-views/by-number-example'));
     elmts.or_views_numberReverseExample.text($.i18n('core-views/by-number-rev-example'));
 
+    elmts.or_views_input.text($.i18n('core-views/split-input'));
+    elmts.or_views_result.text($.i18n('core-views/split-result'));
+
     elmts.okButton.html($.i18n('core-buttons/ok'));
     elmts.cancelButton.text($.i18n('core-buttons/cancel'));
 
@@ -316,8 +319,7 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
     
     elmts.separatorInput.focus().select();
     
-    elmts.cancelButton.click(dismiss);
-    elmts.okButton.click(function() {
+    function doSplitMultiValueCell(input) {
       var mode = $("input[name='split-by-mode']:checked")[0].value;
       var config = {
         columnName: column.name,
@@ -330,8 +332,21 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
           alert($.i18n('core-views/specify-sep'));
           return;
         }
+        
+        // var inputRegex = "/" + config.separator + "/gu";
+        // var regex = JSON.parse(JSON.stringify(inputRegex));
+        if(typeof(input) == "string") {
+          $("input[name='split-result']")[0].value = input.replace(regex, '***');
+          return;
+        }
 
         config.regex = elmts.regexInput[0].checked;
+        // if(config.regex && typeof(input) == "string") {
+        //   var regex = JSON.parse(JSON.stringify(config.separator));
+        //   alert(regex);
+        //   $("input[name='split-result']")[0].value = input.replace(regex, '***');
+        //   return;
+        // }
 
       } else if (mode === "lengths") {
         var s = "[" + elmts.lengthsTextarea[0].value + "]";
@@ -352,21 +367,61 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
 
           config.fieldLengths = JSON.stringify(lengths);
 
+          if(typeof(input) == "string") {
+            var result = input; 
+            var k = 0;
+            var len = 1;
+            var fieldLengths = config.fieldLengths;
+            for(var i = 1; i < fieldLengths.length - 1 && k < result.length; k++, len++)
+            {
+              if(len == fieldLengths[i]) {
+                result = result.substr(0, k + 1) + ", " + result.substr(k + 1);
+                k += 2;
+                i += 2;
+                if(i >= fieldLengths.length - 1) {
+                  result = result.substr(0, k + 1);
+                }
+                len = 0;
+              }
+            }
+            if (result[result.length - 2] === ",") {
+              result = result.substr(0, result.length - 2);
+            }
+            $("input[name='split-result']")[0].value = result;
+            return;
+          }
+
         } catch (e) {
           alert($.i18n('core-views/warning-format'));
           return;
         }
       } else if (mode === "cases") {
         if(elmts.reversTranistionCases[0].checked) {
+          if(typeof(input) == "string") {
+            $("input[name='split-result']")[0].value = input.replace(/(?<=\p{Lu}|[\p{Lu}][\s])(?=\p{Ll})/gu, ', ');
+            return;
+          }
           config.separator = "(?<=\\p{Upper}|[\\p{Upper}][\\s])(?=\\p{Lower})";
         } else {
+          if(typeof(input) == "string") {
+            $("input[name='split-result']")[0].value = input.replace(/(?<=\p{Ll}|[\p{Ll}][\s])(?=\p{Lu})/gu, ', ');
+            return;
+          }
           config.separator = "(?<=\\p{Lower}|[\\p{Lower}][\\s])(?=\\p{Upper})";
         }
         config.regex = true;
       } else if (mode === "number") {
         if(elmts.reversTranistionNumbers[0].checked) {
+          if(typeof(input) == "string") {
+            $("input[name='split-result']")[0].value = input.replace(/(?<=\p{L}|[\p{L}][\s])(?=\p{N})/gu, ', ');
+            return;
+          }
           config.separator = "(?<=\\p{L}|[\\p{L}][\\s])(?=\\p{Digit})";
         } else {
+          if(typeof(input) == "string") {
+            $("input[name='split-result']")[0].value = input.replace(/(?<=\p{N}|[\p{N}][\s])(?=\p{L})/gu, ', ');
+            return;
+          }
           config.separator = "(?<=\\p{Digit}|[\\p{Digit}][\\s])(?=\\p{L})";
         }
         config.regex = true;
@@ -380,6 +435,16 @@ DataTableColumnHeaderUI.extendMenu(function(column, columnHeaderUI, menu) {
       );
 
       dismiss();
+    }
+    
+    elmts.cancelButton.click(dismiss);
+    elmts.okButton.click(doSplitMultiValueCell);
+    
+    document.querySelector("input[name='split-input']").addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        var input = $("input[name='split-input']")[0].value;
+        doSplitMultiValueCell(input);
+      }
     });
   };
 

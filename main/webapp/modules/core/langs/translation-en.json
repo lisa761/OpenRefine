@@ -571,6 +571,8 @@
     "core-views/by-case-rev-example": "[11A, bcD, ef22]",
     "core-views/by-number-example": "[11, AbcDef22]",
     "core-views/by-number-rev-example": "[11AbcDef, 22]",
+    "core-views/split-input": "Input:",
+    "core-views/split-result": "Result:",
     "core-views/after-split": "After Splitting",
     "core-views/guess-cell": "Guess cell type",
     "core-views/remove-col": "Remove this column",
