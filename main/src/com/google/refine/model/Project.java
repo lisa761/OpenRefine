@@ -83,7 +83,6 @@ public class Project {
     public Project() {
         id = generateID();
         history = new History(this);
-        System.out.println("PROJECT.JAVA");
     }
 
     protected Project(long id) {

@@ -65,7 +65,6 @@ public class Cell implements HasFields {
     public Cell(Serializable value, Recon recon) {
         this.value = value;
         this.recon = recon;
-        System.out.print("CELL.JAVA");
     }
     
     @Override
