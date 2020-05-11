@@ -31,14 +31,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 console.log("data-table-view.js");
+var data = [];
 function DataTableView(div) {
+  // console.log('DataTableView');
   this._div = div;
 
   this._gridPagesSizes = JSON.parse(Refine.getPreference("ui.gridPaginationSize", null));
   this._gridPagesSizes = this._checkPaginationSize(this._gridPagesSizes, [ 5, 10, 25, 50 ]);
   // this._pageSize = ( this._gridPagesSizes[0] < 10 ) ? 10 : this._gridPagesSizes[0];
 
-  this._pageSize = 201;
+  this._pageSize = 1000;
   this._showRecon = true;
   this._collapsedColumnNames = {};
   this._sorting = { criteria: [] };
@@ -67,15 +69,16 @@ DataTableView._extenders = [];
   });
 */
 DataTableView.extendMenu = function(extender) {
+  // console.log('extendMenu');
   DataTableView._extenders.push(extender);
 };
 
 DataTableView.prototype.getSorting = function() {
+  // console.log('getSorting');
   return this._sorting;
 };
 
 DataTableView.prototype.resize = function() {
-  
   var topHeight =
     this._div.find(".viewpanel-header").outerHeight(true);
   var tableContainerIntendedHeight = this._div.innerHeight() - topHeight;
@@ -91,6 +94,7 @@ DataTableView.prototype.update = function(onDone) {
 };
 
 DataTableView.prototype.render = function() {
+  // console.log('render');
   var self = this;
 
   var oldTableDiv = this._div.find(".data-table-container");
@@ -114,6 +118,7 @@ DataTableView.prototype.render = function() {
       '</table>' +
     '</div>'
   );
+
   var elmts = DOM.bind(html);
   this._div.empty().append(html);
 
@@ -150,6 +155,7 @@ DataTableView.prototype.render = function() {
   this.resize();
   
   elmts.dataTableContainer[0].scrollLeft = scrollLeft;
+  clusterjs();
 };
 
 DataTableView.prototype._renderSortingControls = function(sortingControls) {
@@ -166,6 +172,7 @@ DataTableView.prototype._renderSortingControls = function(sortingControls) {
 };
 
 DataTableView.prototype._renderPagingControls = function(pageSizeControls, pagingControls) {
+  // console.log('_renderPagingControls');
   var self = this;
 
   self._lastPageNumber = Math.floor((theProject.rowModel.filtered - 1) / this._pageSize) + 1;
@@ -276,6 +283,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
    */
 
   var renderColumnKeys = function(keys) {
+    // console.log('renderColumnKeys');
     if (keys.length > 0) {
       var tr = tableHeader.insertRow(tableHeader.rows.length);
       $(tr.appendChild(document.createElement("th"))).attr('colspan', '3'); // star, flag, row index
@@ -301,6 +309,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   };
 
   var renderColumnGroups = function(groups, keys) {
+    // console.log('renderColumnGroups');
     var nextLayer = [];
 
     if (groups.length > 0) {
@@ -371,6 +380,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   });
   this._columnHeaderUIs = [];
   var createColumnHeader = function(column, index) {
+    console.log('createColumnHeader');
     var th = trHead.appendChild(document.createElement("th"));
     $(th).addClass("column-header").attr('title', column.name);
     if (self._collapsedColumnNames.hasOwnProperty(column.name)) {
@@ -394,8 +404,9 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
    */
 
   var rows = theProject.rowModel.rows;
-  console.log(JSON.stringify(theProject));
+  // console.log(JSON.stringify(theProject));
   var renderRow = function(tr, r, row, even) {
+    console.log('renderRow');
     $(tr).empty();
     var cells = row.cells;
     var tdStar = tr.insertCell(tr.cells.length);
@@ -445,13 +456,13 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       if ("j" in row) {
         $(tr).addClass("record");
         $('<div></div>').html((row.j + 1) + ".").appendTo(tdIndex);
-        console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
+        // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
       } else {
         $('<div></div>').html("&nbsp;").appendTo(tdIndex);
       }
     } else {
       $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
-      console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
+      // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     }
 
     $(tr).addClass(even ? "even" : "odd");
@@ -466,6 +477,14 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
       }
     }
+
+    // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
+    // console.log(tr.innerHTML);
+    if(even) {
+      data.push('<tr class="even">' + tr.innerHTML + '</tr>');
+    }
+    else data.push('<tr class="odd">' + tr.innerHTML + '</tr>');
+    // console.log(data);
   };
 
   var even = true;
@@ -480,6 +499,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 };
 
 DataTableView.prototype._showRows = function(start, onDone) {
+  // console.log('_showRows');
   var self = this;
   Refine.fetchRows(start, this._pageSize, function() {
     self.render();
@@ -638,6 +658,7 @@ DataTableView.prototype._addSortingCriterion = function(criterion, alone) {
   /** above can be move to seperate file **/
   
 DataTableView.prototype._createMenuForAllColumns = function(elmt) {
+  // console.log('_createMenuForAllColumns');
   var self = this;
   var menu = [
         {
@@ -1005,6 +1026,7 @@ DataTableView.prototype._updateCell = function(rowIndex, cellIndex, cell) {
 };
 
 DataTableView.sampleVisibleRows = function(column) {
+  // console.log('sampleVisibleRows');
   var rowIndices = [];
   var values = [];
 
@@ -1043,3 +1065,14 @@ DataTableView.promptExpressionOnVisibleRows = function(column, title, expression
     onDone
   );
 };
+
+var clusterjs = function() {
+  var scrollArea = document.querySelector('#scroll-area');
+    // console.log(scrollArea);
+    console.log(data.length);
+    var clusterize = new Clusterize({
+      rows: data,
+      scrollId: 'scroll-area',
+      contentId: 'content-area'
+    });
+}
