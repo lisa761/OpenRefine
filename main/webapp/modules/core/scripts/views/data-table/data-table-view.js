@@ -31,10 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 console.log("data-table-view.js");
+var data = [];
 function DataTableView(div) {
+  // console.log('DataTableView');
   this._div = div;
 
-  this._pageSize = 201;
+  this._pageSize = 1000;
   this._showRecon = true;
   this._collapsedColumnNames = {};
   this._sorting = { criteria: [] };
@@ -60,14 +62,17 @@ DataTableView._extenders = [];
   });
 */
 DataTableView.extendMenu = function(extender) {
+  // console.log('extendMenu');
   DataTableView._extenders.push(extender);
 };
 
 DataTableView.prototype.getSorting = function() {
+  // console.log('getSorting');
   return this._sorting;
 };
 
 DataTableView.prototype.resize = function() {
+  // console.log('resize');
   this._adjustDataTables();
   
   var topHeight =
@@ -81,10 +86,12 @@ DataTableView.prototype.resize = function() {
 };
 
 DataTableView.prototype.update = function(onDone) {
+  // console.log('update');
   this._showRows(0, onDone);
 };
 
 DataTableView.prototype.render = function() {
+  // console.log('render');
   var self = this;
 
   var oldTableDiv = this._div.find(".data-table-container");
@@ -102,10 +109,33 @@ DataTableView.prototype.render = function() {
     '<div bind="dataHeaderTableContainer" class="data-header-table-container">' +
       '<table bind="headerTable" class="data-header-table"></table>' +
     '</div>' +
-    '<div bind="dataTableContainer" class="data-table-container">' +
-      '<table bind="table" class="data-table"></table>' +
+    // '<div bind="dataTableContainer" class="data-table-container">' +
+    //   '<table bind="table" class="data-table"></table>' +
+    // '</div>'
+    // '<div bind="dataTableContainer" id="scroll-area" class="data-table-container clusterize">' +
+    //   '<div class="clusterize-scroll">' +
+    //     '<table bind="table" class="data-table">' +
+    //       '<tbody id="content-area" class="clusterize-content"></tbody>' +
+    //     '</table>' +
+    //   '</div>' +
+    // '</div>'
+    '<div class="clusterize">' +
+      '<div bind="dataTableContainer" id="scroll-area" class="data-table-container clusterize-scroll">' +
+        '<table bind="table" class="data-table">' +
+          '<tbody id="content-area" class="clusterize-content"></tbody>' +
+        '</table>' +
+      '</div>' +
     '</div>'
   );
+  // <div class="clusterize">
+  //   <div id="scroll-area1" class="clusterize-scroll">
+  //     <table>
+  //       <tbody id="content-area1" class="clusterize-content">
+  //       </tbody>
+  //     </table>
+  //   </div>
+  // </div>
+
   var elmts = DOM.bind(html);
 
   ui.summaryBar.updateResultCount();
@@ -142,6 +172,7 @@ DataTableView.prototype.render = function() {
   this.resize();
   
   elmts.dataTableContainer[0].scrollLeft = scrollLeft;
+  clusterjs();
 };
 
 DataTableView.prototype._renderSortingControls = function(sortingControls) {
@@ -158,6 +189,7 @@ DataTableView.prototype._renderSortingControls = function(sortingControls) {
 };
 
 DataTableView.prototype._renderPagingControls = function(pageSizeControls, pagingControls) {
+  // console.log('_renderPagingControls');
   var self = this;
 
   var from = (theProject.rowModel.start + 1);
@@ -211,6 +243,7 @@ DataTableView.prototype._renderPagingControls = function(pageSizeControls, pagin
 };
 
 DataTableView.prototype._renderDataTables = function(table, headerTable) {
+  // console.log('_renderDataTables: ');
   var self = this;
 
   var columns = theProject.columnModel.columns;
@@ -222,6 +255,7 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
    */
 
   var renderColumnKeys = function(keys) {
+    // console.log('renderColumnKeys');
     if (keys.length > 0) {
       var tr = headerTable.insertRow(headerTable.rows.length);
       $(tr.insertCell(0)).attr('colspan', '3'); // star, flag, row index
@@ -244,6 +278,7 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
   };
 
   var renderColumnGroups = function(groups, keys) {
+    // console.log('renderColumnGroups');
     var nextLayer = [];
 
     if (groups.length > 0) {
@@ -314,6 +349,7 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
   });
   this._columnHeaderUIs = [];
   var createColumnHeader = function(column, index) {
+    console.log('createColumnHeader');
     var td = trHead.insertCell(trHead.cells.length);
     $(td).addClass("column-header").attr('title', column.name);
     if (column.name in self._collapsedColumnNames) {
@@ -337,8 +373,9 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
    */
 
   var rows = theProject.rowModel.rows;
-  console.log(JSON.stringify(theProject));
+  // console.log(JSON.stringify(theProject));
   var renderRow = function(tr, r, row, even) {
+    console.log('renderRow');
     $(tr).empty();
 
     var cells = row.cells;
@@ -394,13 +431,13 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
       if ("j" in row) {
         $(tr).addClass("record");
         $('<div></div>').html((row.j + 1) + ".").appendTo(tdIndex);
-        console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
+        // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
       } else {
         $('<div></div>').html("&nbsp;").appendTo(tdIndex);
       }
     } else {
       $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
-      console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
+      // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     }
 
     $(tr).addClass(even ? "even" : "odd");
@@ -415,6 +452,14 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
         new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
       }
     }
+
+    // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
+    // console.log(tr.innerHTML);
+    if(even) {
+      data.push('<tr class="even">' + tr.innerHTML + '</tr>');
+    }
+    else data.push('<tr class="odd">' + tr.innerHTML + '</tr>');
+    // console.log(data);
   };
 
   var even = true;
@@ -427,12 +472,15 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
     renderRow(tr, r, row, even);
   }
   
-  $(table.parentNode).bind('scroll', function(evt) {
-    self._adjustDataTableScroll();
-  });
+  // $(table.parentNode).bind('scroll', function(evt) {
+  //   self._adjustDataTableScroll();
+  //   console.log('scrolling');
+  // });
+  // console.log('end _renderDataTables');
 };
 
 DataTableView.prototype._adjustDataTables = function() {
+  // console.log('_adjustDataTables');
   var dataTable = this._div.find('.data-table');
   var headerTable = this._div.find('.data-header-table');
   if (dataTable.length === 0 || headerTable.length === 0) {
@@ -476,6 +524,7 @@ DataTableView.prototype._adjustDataTables = function() {
 };
 
 DataTableView.prototype._adjustDataTableScroll = function() {
+  // console.log('_adjustDataTableScroll');
   var dataTableContainer = this._div.find('.data-table-container');
   var headerTableContainer = this._div.find('.data-header-table-container');
   if (dataTableContainer.length > 0 && headerTableContainer.length > 0) {
@@ -486,6 +535,7 @@ DataTableView.prototype._adjustDataTableScroll = function() {
 };
 
 DataTableView.prototype._showRows = function(start, onDone) {
+  // console.log('_showRows');
   var self = this;
   Refine.fetchRows(start, this._pageSize, function() {
     self.render();
@@ -604,6 +654,7 @@ DataTableView.prototype._addSortingCriterion = function(criterion, alone) {
   /** above can be move to seperate file **/
   
 DataTableView.prototype._createMenuForAllColumns = function(elmt) {
+  // console.log('_createMenuForAllColumns');
   var self = this;
   var menu = [
         {
@@ -971,6 +1022,7 @@ DataTableView.prototype._updateCell = function(rowIndex, cellIndex, cell) {
 };
 
 DataTableView.sampleVisibleRows = function(column) {
+  // console.log('sampleVisibleRows');
   var rowIndices = [];
   var values = [];
 
@@ -1009,3 +1061,14 @@ DataTableView.promptExpressionOnVisibleRows = function(column, title, expression
     onDone
   );
 };
+
+var clusterjs = function() {
+  var scrollArea = document.querySelector('#scroll-area');
+    // console.log(scrollArea);
+    console.log(data.length);
+    var clusterize = new Clusterize({
+      rows: data,
+      scrollId: 'scroll-area',
+      contentId: 'content-area'
+    });
+}
