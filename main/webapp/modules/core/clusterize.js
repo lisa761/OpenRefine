@@ -78,7 +78,7 @@ console.log("HELLO!");
     scroll_debounce = 0,
     pointer_events_set = false,
     scrollEv = function() {
-      console.log('scrollEv');
+      // console.log('scrollEv');
       // console.log(self);
       // fixes scrolling issue on Mac #3
       if (is_mac) {
@@ -96,7 +96,7 @@ console.log("HELLO!");
         self.insertToDOM(rows, cache);
       if (self.options.callbacks.scrollingProgress)
         self.options.callbacks.scrollingProgress(self.getScrollProgress());
-      console.log('HERE: ' + self.getClusterNum());
+      // console.log('HERE: ' + self.getClusterNum());
     },
     resize_debounce = 0,
     resizeEv = function() {
@@ -114,7 +114,7 @@ console.log("HELLO!");
     //     // }
     // }, true);
     // document.addEventListener('scroll', scrollEv, true);
-    on('resize', window, resizeEv);
+    // on('resize', window, resizeEv);
 
     // public methods
     self.destroy = function(clean) {
