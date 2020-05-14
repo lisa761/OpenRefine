@@ -31,12 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 console.log("data-table-view.js");
-var data = [];
 function DataTableView(div) {
   // console.log('DataTableView');
   this._div = div;
 
-  this._pageSize = 1000;
+  this._pageSize = 10;
   this._showRecon = true;
   this._collapsedColumnNames = {};
   this._sorting = { criteria: [] };
@@ -109,32 +108,10 @@ DataTableView.prototype.render = function() {
     '<div bind="dataHeaderTableContainer" class="data-header-table-container">' +
       '<table bind="headerTable" class="data-header-table"></table>' +
     '</div>' +
-    // '<div bind="dataTableContainer" class="data-table-container">' +
-    //   '<table bind="table" class="data-table"></table>' +
-    // '</div>'
-    // '<div bind="dataTableContainer" id="scroll-area" class="data-table-container clusterize">' +
-    //   '<div class="clusterize-scroll">' +
-    //     '<table bind="table" class="data-table">' +
-    //       '<tbody id="content-area" class="clusterize-content"></tbody>' +
-    //     '</table>' +
-    //   '</div>' +
-    // '</div>'
-    '<div class="clusterize">' +
-      '<div bind="dataTableContainer" id="scroll-area" class="data-table-container clusterize-scroll">' +
-        '<table bind="table" class="data-table">' +
-          '<tbody id="content-area" class="clusterize-content"></tbody>' +
-        '</table>' +
-      '</div>' +
+    '<div bind="dataTableContainer" class="data-table-container">' +
+      '<table bind="table" class="data-table"></table>' +
     '</div>'
   );
-  // <div class="clusterize">
-  //   <div id="scroll-area1" class="clusterize-scroll">
-  //     <table>
-  //       <tbody id="content-area1" class="clusterize-content">
-  //       </tbody>
-  //     </table>
-  //   </div>
-  // </div>
 
   var elmts = DOM.bind(html);
 
@@ -172,7 +149,6 @@ DataTableView.prototype.render = function() {
   this.resize();
   
   elmts.dataTableContainer[0].scrollLeft = scrollLeft;
-  clusterjs();
 };
 
 DataTableView.prototype._renderSortingControls = function(sortingControls) {
@@ -453,13 +429,7 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
       }
     }
 
-    // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     // console.log(tr.innerHTML);
-    if(even) {
-      data.push('<tr class="even">' + tr.innerHTML + '</tr>');
-    }
-    else data.push('<tr class="odd">' + tr.innerHTML + '</tr>');
-    // console.log(data);
   };
 
   var even = true;
@@ -472,11 +442,6 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
     renderRow(tr, r, row, even);
   }
   
-  // $(table.parentNode).bind('scroll', function(evt) {
-  //   self._adjustDataTableScroll();
-  //   console.log('scrolling');
-  // });
-  // console.log('end _renderDataTables');
 };
 
 DataTableView.prototype._adjustDataTables = function() {
@@ -1061,14 +1026,3 @@ DataTableView.promptExpressionOnVisibleRows = function(column, title, expression
     onDone
   );
 };
-
-var clusterjs = function() {
-  var scrollArea = document.querySelector('#scroll-area');
-    // console.log(scrollArea);
-    console.log(data.length);
-    var clusterize = new Clusterize({
-      rows: data,
-      scrollId: 'scroll-area',
-      contentId: 'content-area'
-    });
-}
