@@ -69,10 +69,7 @@ DataTableCellUI.prototype._render = function() {
   .addClass("data-table-cell-edit")
   .attr("title", $.i18n('core-views/edit-cell'))
   .appendTo(divContent)
-  .on('click', function() { console.log('added click'); self._startEdit(this); });
-  // .click(function() { console.log('added click'); self._startEdit(this); });
-  // console.log($('.data-table-cell-edit'));
-  // $('.data-table-cell-edit').click(function() { console.log('added click'); self._startEdit(this); });
+  .click(function() { console.log('added click'); self._startEdit(this); });
 
   $(this._td).empty()
   .unbind()
