@@ -117,7 +117,6 @@ DataTableView.prototype.render = function() {
       '</table>' +
     '</div>'
   );
-
   var elmts = DOM.bind(html);
   this._div.empty().append(html);
 
@@ -475,7 +474,6 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
       }
     }
-
     // console.log(tr.innerHTML);
   };
 
