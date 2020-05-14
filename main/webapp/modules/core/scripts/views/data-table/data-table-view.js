@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 console.log("data-table-view.js");
-var data = [];
 function DataTableView(div) {
   // console.log('DataTableView');
   this._div = div;
@@ -40,7 +39,7 @@ function DataTableView(div) {
   this._gridPagesSizes = this._checkPaginationSize(this._gridPagesSizes, [ 5, 10, 25, 50 ]);
   // this._pageSize = ( this._gridPagesSizes[0] < 10 ) ? 10 : this._gridPagesSizes[0];
 
-  this._pageSize = 1000;
+  this._pageSize = 10;
   this._showRecon = true;
   this._collapsedColumnNames = {};
   this._sorting = { criteria: [] };
@@ -155,7 +154,6 @@ DataTableView.prototype.render = function() {
   this.resize();
   
   elmts.dataTableContainer[0].scrollLeft = scrollLeft;
-  clusterjs();
 };
 
 DataTableView.prototype._renderSortingControls = function(sortingControls) {
@@ -478,13 +476,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       }
     }
 
-    // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     // console.log(tr.innerHTML);
-    if(even) {
-      data.push('<tr class="even">' + tr.innerHTML + '</tr>');
-    }
-    else data.push('<tr class="odd">' + tr.innerHTML + '</tr>');
-    // console.log(data);
   };
 
   var even = true;
@@ -1065,14 +1057,3 @@ DataTableView.promptExpressionOnVisibleRows = function(column, title, expression
     onDone
   );
 };
-
-var clusterjs = function() {
-  var scrollArea = document.querySelector('#scroll-area');
-    // console.log(scrollArea);
-    console.log(data.length);
-    var clusterize = new Clusterize({
-      rows: data,
-      scrollId: 'scroll-area',
-      contentId: 'content-area'
-    });
-}
