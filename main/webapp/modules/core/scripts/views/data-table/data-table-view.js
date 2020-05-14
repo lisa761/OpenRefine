@@ -112,7 +112,6 @@ DataTableView.prototype.render = function() {
       '<table bind="table" class="data-table"></table>' +
     '</div>'
   );
-
   var elmts = DOM.bind(html);
 
   ui.summaryBar.updateResultCount();
@@ -428,7 +427,6 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
         new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
       }
     }
-
     // console.log(tr.innerHTML);
   };
 
@@ -442,6 +440,9 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
     renderRow(tr, r, row, even);
   }
   
+  $(table.parentNode).bind('scroll', function(evt) {
+    self._adjustDataTableScroll();
+  });
 };
 
 DataTableView.prototype._adjustDataTables = function() {
