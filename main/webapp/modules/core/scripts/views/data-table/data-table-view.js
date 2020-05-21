@@ -31,16 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 console.log("data-table-view.js");
+var scrollTop = 0;
 function DataTableView(div) {
   // console.log('DataTableView');
   this._div = div;
 
-  this._pageSize = 10;
+  this._pageSize = 50;
   this._showRecon = true;
   this._collapsedColumnNames = {};
   this._sorting = { criteria: [] };
   this._columnHeaderUIs = [];
   this._shownulls = false;
+  this._totalSize = this._pageSize;
 
   this._showRows(0);
 }
@@ -439,9 +441,12 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
     }
     renderRow(tr, r, row, even);
   }
-  
   $(table.parentNode).bind('scroll', function(evt) {
     self._adjustDataTableScroll();
+    scrollTop = $(this).scrollTop();
+    if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+      self._onBottomTable(table, this, evt);
+    }
   });
 };
 
@@ -485,11 +490,10 @@ DataTableView.prototype._adjustDataTables = function() {
     headerTd.width('1%').find('> div').width(commonWidth);
     dataTd.children().first().width(commonWidth);
   }
-  
-  this._adjustDataTableScroll();
+  this._adjustDataTableScroll(scrollTop);
 };
 
-DataTableView.prototype._adjustDataTableScroll = function() {
+DataTableView.prototype._adjustDataTableScroll = function(scrollTopReceived) {
   // console.log('_adjustDataTableScroll');
   var dataTableContainer = this._div.find('.data-table-container');
   var headerTableContainer = this._div.find('.data-header-table-container');
@@ -498,6 +502,16 @@ DataTableView.prototype._adjustDataTableScroll = function() {
       .find('> .data-header-table')
       .css('left', '-' + dataTableContainer[0].scrollLeft + 'px');
   }
+  if (scrollTopReceived) {
+    setScroll();
+  }
+};
+
+var setScroll = function() {
+  setTimeout(function() {
+    $('.data-table-container').scrollTop(scrollTop);
+    console.log($('.data-table-container').scrollTop());
+  }, 0);
 };
 
 DataTableView.prototype._showRows = function(start, onDone) {
@@ -512,12 +526,29 @@ DataTableView.prototype._showRows = function(start, onDone) {
   }, this._sorting);
 };
 
+DataTableView.prototype._showRowsBottom = function(table, start, onDone) {
+  // console.log('_showRowsoBttom' + ' ' + this._totalSize);
+  var self = this;
+  this._totalSize += this._pageSize;
+  Refine.fetchRows(start, this._totalSize, function() {
+    self.render();
+
+    if (onDone) {
+      onDone();
+    }
+  }, this._sorting);
+};
+
 DataTableView.prototype._onClickPreviousPage = function(elmt, evt) {
   this._showRows(theProject.rowModel.start - this._pageSize);
 };
 
 DataTableView.prototype._onClickNextPage = function(elmt, evt) {
   this._showRows(theProject.rowModel.start + this._pageSize);
+};
+
+DataTableView.prototype._onBottomTable = function(table, elmt, evt) {
+  this._showRowsBottom(table, theProject.rowModel.start);
 };
 
 DataTableView.prototype._onClickFirstPage = function(elmt, evt) {
