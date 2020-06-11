@@ -461,17 +461,11 @@ DataTableView.prototype._renderDataTables = function(table, headerTable) {
     //   }
     // }
   });
-  // var observer = new IntersectionObserver(function(entries) {
-  //   if(entries[0].isIntersecting === true) {
-  //     console.log('Element has just become visible in screen');
-  //     DataTableView.prototype._onBottomTable(table, this, evt);;
-  //   }
-  // }, { threshold: [0] });
-  // observer.observe(document.querySelector(".last-row"));
 };
 
 DataTableView.prototype._adjustDataTables = function(table) {
   console.log('_adjustDataTables');
+  var self = this;
   var dataTable = this._div.find('.data-table');
   var headerTable = this._div.find('.data-header-table');
   if (dataTable.length === 0 || headerTable.length === 0) {
@@ -521,6 +515,21 @@ DataTableView.prototype._adjustDataTables = function(table) {
   $('tr:last').addClass('last-row');
   $('tr:nth-last-child(50)').addClass('load-next-set');
 
+  // var observer = new IntersectionObserver(function(entries) {
+  //   console.log(entries);
+  //   // console.log(entries[0]['intersectionRatio'] > 0);
+  //   // if(entries[0].isIntersecting === true)
+  //   if(entries[0]['intersectionRatio'] > 0) {
+  //     console.log('Element is fully visible in screen');
+  //     // var elmt = document.querySelector('.data-table-container');
+  //     // console.log(this._totalSize);
+  //     // DataTableView.prototype._onBottomTable(table, elmt);
+  //     self._onBottomTable(table);
+  //   }
+  // }, { threshold: [0.1] });
+  
+  // observer.observe(document.querySelector(".load-next-set"));
+
   this._adjustDataTableScroll();
 };
 
@@ -549,7 +558,6 @@ DataTableView.prototype._showRows = function(start, onDone) {
 
 DataTableView.prototype._showRowsBottom = function(table, start, onDone) {
   console.log('_showRowsBottom');
-
   this._totalSize += this._pageSize;
   var sizeRowFirst = $('tr:eq(1)').height();
   var sizeRowsTotal = sizeRowFirst * theProject.rowModel.total;
@@ -592,6 +600,8 @@ DataTableView.prototype._onClickNextPage = function(elmt, evt) {
 };
 
 DataTableView.prototype._onBottomTable = function(table, elmt, evt) {
+  // console.log(elmt);
+  // console.log(this._totalSize + this._pageSize);
   this._showRowsBottom(table, theProject.rowModel.start + this._pageSize);
 };
 
