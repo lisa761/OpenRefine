@@ -46,6 +46,8 @@ function DataTableView(div) {
   this._columnHeaderUIs = [];
   this._shownulls = false;
   this._totalSize = this._pageSize;
+  this._sizeRowFirst = 0;
+  this._sizeRowsTotal = 0;
 
   this._currentPageNumber = 1;
   this._showRows(0);
@@ -404,9 +406,8 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
    *------------------------------------------------------------
    */
 
-  var rows = theProject.rowModel.rows;
-  // var renderRow = function(tr, r, row, even) {
-  window.renderRow = function(tr, r, row, even) {
+  // var rows = theProject.rowModel.rows;
+  var renderRow = function(tr, r, row, even) {
     // console.log(JSON.stringify(tr) + ' ' + r + ' ' + /*JSON.stringify(row) + ' '*/ + even);
     console.log('renderRow');
     $(tr).empty();
@@ -481,15 +482,20 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     }
   };
 
-  var even = true;
-  for (var r = 0; r < rows.length; r++) {
-    var row = rows[r];
-    var tr = table.insertRow(table.rows.length);
-    if (theProject.rowModel.mode == "row-based" || "j" in row) {
-      even = !even;
+  window.loadRows = function() {
+    var rows = theProject.rowModel.rows;
+    var even = true;
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r];
+      var tr = table.insertRow(table.rows.length);
+      if (theProject.rowModel.mode == "row-based" || "j" in row) {
+        even = !even;
+      }
+      renderRow(tr, r, row, even);
     }
-    renderRow(tr, r, row, even);
   }
+  loadRows();
+
   $(table.parentNode.parentNode).bind('scroll', function(evt) {
     var element = document.querySelector('.load-next-set');
     var position = element.getBoundingClientRect();
@@ -514,16 +520,21 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
 DataTableView.prototype._adjustDataTables = function() {
   console.log('_adjustDataTables');
-  var sizeRowFirst = $('tr:eq(1)').height();
-  var sizeRowsTotal = sizeRowFirst * theProject.rowModel.total;
-  var heightToAdd = sizeRowsTotal - this._totalSize * sizeRowFirst;
-  console.log(sizeRowFirst + ' ' + sizeRowsTotal);
-  console.log(heightToAdd);
-  document.querySelector('.data-table').insertRow(this._totalSize);
+  var self = this;
+  
+  this._sizeRowFirst = $('tr:eq(1)').height();
+  this._sizeRowsTotal = this._sizeRowFirst * theProject.rowModel.total;
 
-  $('tr:last').css('height', heightToAdd);
-  $('tr:last').addClass('last-row');
-  $('tr:nth-last-child(50)').addClass('load-next-set');
+  window.adjustNextSetClasses = function() {
+    var heightToAdd = self._sizeRowsTotal - self._totalSize * self._sizeRowFirst;
+    console.log(self._sizeRowFirst + ' ' + self._sizeRowsTotal);
+    console.log(heightToAdd);
+    document.querySelector('.data-table').insertRow(self._totalSize + 1);
+    $('tr:last').css('height', heightToAdd);
+    $('tr:last').addClass('last-row');
+    $('tr:nth-last-child(50)').addClass('load-next-set');
+  }
+  adjustNextSetClasses();
 
   // var observer = new IntersectionObserver(function(entries) {
   //   console.log(entries);
@@ -556,31 +567,13 @@ DataTableView.prototype._showRows = function(start, onDone) {
 DataTableView.prototype._showRowsBottom = function(table, start, onDone) {
   console.log('_showRowsBottom');
   this._totalSize += this._pageSize;
-  var sizeRowFirst = $('tr:eq(1)').height();
-  var sizeRowsTotal = sizeRowFirst * theProject.rowModel.total;
-  var heightToAdd = sizeRowsTotal - this._totalSize * sizeRowFirst;
   $('tr.load-next-set').removeClass('load-next-set');
-  // console.log(heightToAdd + ' totalSize=' + this._totalSize + ' pageSize=' + this._pageSize);
-  var lastRow = this._totalSize;
 
   Refine.fetchRows(start, this._pageSize, function() {
     table.deleteRow(table.rows.length - 1);
-    var rows = theProject.rowModel.rows;
-    // console.log(rows.length);
-    var even = true;
-    for (var r = 0; r < rows.length; r++) {
-      var row = rows[r];
-      var tr = table.insertRow(table.rows.length);
-      if (theProject.rowModel.mode == "row-based" || "j" in row) {
-        even = !even;
-      }
-      renderRow(tr, r, row, even);
-    }
 
-    document.querySelector('.data-table').insertRow(lastRow);
-    $('tr:last').css('height', heightToAdd);
-    $('tr:last').addClass('last-row');
-    $('tr:nth-last-child(50)').addClass('load-next-set');
+    loadRows();
+    adjustNextSetClasses();
     
     if (onDone) {
       onDone();
