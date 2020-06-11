@@ -459,10 +459,10 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       if ("j" in row) {
         $(tr).addClass("record");
         $('<div></div>').html((row.j + 1) + ".").appendTo(tdIndex);
-        // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
       } else {
         $('<div></div>').html("&nbsp;").appendTo(tdIndex);
       }
+      // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     } else {
       $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
       // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
@@ -523,16 +523,26 @@ DataTableView.prototype._adjustDataTables = function() {
   var self = this;
   
   this._sizeRowFirst = $('tr:eq(1)').height();
-  this._sizeRowsTotal = this._sizeRowFirst * theProject.rowModel.total;
+  this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
 
   window.adjustNextSetClasses = function() {
-    var heightToAdd = self._sizeRowsTotal - self._totalSize * self._sizeRowFirst;
-    console.log(self._sizeRowFirst + ' ' + self._sizeRowsTotal);
-    console.log(heightToAdd);
-    document.querySelector('.data-table').insertRow(self._totalSize + 1);
-    $('tr:last').css('height', heightToAdd);
-    $('tr:last').addClass('last-row');
+    // console.log(self._totalSize);
+    // var heightToAdd = self._sizeRowsTotal - self._totalSize * self._sizeRowFirst;
+    var heightToAdd = self._sizeRowsTotal - ($('tr').length - 1) * self._sizeRowFirst;
+    // console.log(self._sizeRowFirst + ' ' + self._sizeRowsTotal);
+    // console.log(heightToAdd);
+    if(self._totalSize < theProject.rowModel.total) {
+      document.querySelector('.data-table').insertRow(self._totalSize + 1);
+      $('tr:last').css('height', heightToAdd);
+      $('tr:last').addClass('last-row');
+    }
     $('tr:nth-last-child(50)').addClass('load-next-set');
+    
+    // if (theProject.rowModel.mode == "record-based") {
+    //   $('tr.record:nth-last-child(50)').addClass('load-next-set');
+    // } else {
+    //   $('tr:nth-last-child(50)').addClass('load-next-set');
+    // }
   }
   adjustNextSetClasses();
 
