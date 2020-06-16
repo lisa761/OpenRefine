@@ -632,7 +632,9 @@ DataTableView.prototype._onClickNextPage = function(elmt, evt) {
 DataTableView.prototype._onBottomTable = function(table, elmt, evt) {
   // console.log(elmt);
   // console.log(this._totalSize + this._pageSize);
-  this._showRowsBottom(table, theProject.rowModel.start + this._pageSize);
+  if(this._totalSize < theProject.rowModel.total) {
+    this._showRowsBottom(table, theProject.rowModel.start + this._pageSize);
+  }
 };
 
 DataTableView.prototype._onClickFirstPage = function(elmt, evt) {
