@@ -530,7 +530,7 @@ DataTableView.prototype._adjustNextSetClasses = function() {
   // console.log(this._sizeRowFirst + ' ' + this._sizeRowsTotal);
   // console.log(heightToAdd);
   if(this._totalSize < theProject.rowModel.total) {
-    document.querySelector('.data-table').insertRow(this._totalSize + 1);
+    document.querySelector('.data-table').insertRow();
     $('tr:last').css('height', heightToAdd);
     $('tr:last').addClass('last-row');
   }
