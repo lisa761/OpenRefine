@@ -49,6 +49,9 @@ function DataTableView(div) {
   this._sizeRowFirst = 0;
   this._sizeRowsTotal = 0;
   this._sizeSinglePage = 0;
+  this._scrollTop = 0;
+  this._downwardDirection;
+  this._pageStart = 0;
 
   this._currentPageNumber = 1;
   this._showRows(0);
@@ -490,16 +493,30 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     }
   };
 
-  window.loadRows = function() {
+  window.loadRows = function(start) {
     var rows = theProject.rowModel.rows;
+    // console.log(JSON.stringify(rows));
     var even = true;
     for (var r = 0; r < rows.length; r++) {
       var row = rows[r];
-      var tr = table.insertRow(table.rows.length);
+      // console.log(JSON.stringify(row));
+      // console.log(start + r);
+      // if(start != null)
+      //   console.log(start + r);
+      var tr;
+      if(start != null) {
+        // console.log(start + r);
+        tr = table.insertRow(Math.max(0, r + 1));
+      }
+      else {
+        tr = table.insertRow(table.rows.length);
+      }
+      // console.log(tr);
       if (theProject.rowModel.mode == "row-based" || "j" in row) {
         even = !even;
       }
       renderRow(tr, r, row, even);
+      // start++;
     }
   }
   loadRows();
@@ -507,37 +524,70 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   $(table.parentNode.parentNode).bind('scroll', function(evt) {
 
     // console.log($(this).scrollTop());
-    var scrollTop = $(this).scrollTop();
+    // console.log(self._scrollTop >= $(this).scrollTop());
+    self._downwardDirection = self._scrollTop < $(this).scrollTop();
+    // console.log(self._scrollTop + ' ' + $(this).scrollTop() + ' ' + self._downwardDirection);
+    // console.log(self._downwardDirection);
+    self._scrollTop = $(this).scrollTop();
     // console.log(scrollTop);
 
-    var element = document.querySelector('.load-next-set');
+    var element = document.querySelectorAll('.load-next-set');
+    element = element[element.length - 1];
     var position = element.getBoundingClientRect();
-    var element2 = document.querySelector('.last-row');
+    var element2 = document.querySelector('.load-next-set');
     var position2 = element2.getBoundingClientRect();
-    var element3 = document.querySelector('.first-row');
-    var position3 = element3.getBoundingClientRect();
-    // console.log(position2.top);
-    if((position.top >= 0 && position.bottom <= window.innerHeight) || 
-      (position2.top < window.innerHeight && position2.top > 0  && position2.bottom + 50 >= window.innerHeight)) {
-      console.log('Loading next set');
-      self._onBottomTable(table, this, evt);
+    var lastElement = document.querySelector('.last-row');
+    var positionLastElement = lastElement.getBoundingClientRect();
+    var firstElement = document.querySelector('.first-row');
+    var positionFirstElement = firstElement.getBoundingClientRect();
+    // console.log(positionLastElement.top);
+    // if((position.top >= 0 && position.bottom <= window.innerHeight) || 
+    //   (positionLastElement.top < window.innerHeight && positionLastElement.top > 0  && positionLastElement.bottom + 50 >= window.innerHeight)) {
+    //   console.log('Loading next set');
+    //   self._onBottomTable(table, this, evt);
+    // }
+
+    // if(position.top >= 0 && position.bottom <= window.innerHeight) {
+      if(self._downwardDirection) {
+        if((position.top >= 0 && position.bottom <= window.innerHeight) || 
+          (positionLastElement.top < window.innerHeight && positionLastElement.top > 0  && positionLastElement.bottom + 50 >= window.innerHeight)) {
+          console.log('Loading next set');
+          self._onBottomTable(self._scrollTop, table, this, evt);
+        }
+      }
+    // }
+    if(position2.top >= 0 && position2.bottom <= window.innerHeight) {
+      // console.log(self._scrollTop > $(this).scrollTop() + 10);
+      if(!self._downwardDirection && self._scrollTop < $(this).scrollTop() + 10) {
+        console.log('Loading upper set');
+        self._onTopTable(self._scrollTop, table, this, evt);
+      }
     }
-    // console.log(position2.top + ' ' + position2.bottom + ' \n ' + position3.top + ' ' + position3.bottom);
+    // console.log(positionLastElement.top + ' ' + positionLastElement.bottom + ' \n ' + positionFirstElement.top + ' ' + positionFirstElement.bottom);
     clearTimeout($.data(this, 'scrollTimer'));
     $.data(this, 'scrollTimer', setTimeout(function() {
-      if(position2.top <= 0 && position2.bottom >= 0) {
+      // self._downwardDirection = self._scrollTop < $(this).scrollTop();
+      if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
         console.log('Last row is partially visible in screen');
-        var goto = self.getPageNumberSrcolling(scrollTop);
-        console.log(goto + ' ' + scrollTop);
-        self._onChangeGotoScrolling(scrollTop, goto, table);
+        var goto = self.getPageNumberSrcolling(self._scrollTop);
+        console.log(goto + ' ' + self._scrollTop);
+        self._onChangeGotoScrolling(self._scrollTop, goto, table);
       }
       
-      if(position3.top <= 150 && position3.bottom >= 0) {
+      if(positionFirstElement.top <= 150 && positionFirstElement.bottom >= window.innerHeight) {
         console.log('First row is partially visible in screen');
-        var goto = self.getPageNumberSrcolling(scrollTop);
-        console.log(goto + ' ' + scrollTop);
-        self._onChangeGotoScrolling(scrollTop, goto, table);
+        var goto = self.getPageNumberSrcolling(self._scrollTop);
+        console.log(goto + ' ' + self._scrollTop);
+        self._onChangeGotoScrolling(self._scrollTop, goto, table);
       }
+
+      // if(position2.top >= 0 && position2.bottom <= window.innerHeight) {
+      //   if(!self._downwardDirection && self._scrollTop <= $(this).scrollTop() + 50) {
+      //   // if(!self._downwardDirection ) {
+      //     console.log('Loading upper set');
+      //     self._onTopTable(self._scrollTop, table, this, evt);
+      //   }
+      // }
       // console.log("Haven't scrolled in 250ms!");
     }, 250));
   });
@@ -545,31 +595,64 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
 DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition) {
   var num = Math.floor(scrollPosition / this._sizeSinglePage);
+  // var num = Math.floor(theProject.metadata.rowCount / this._totalSize);
+  // var num = Math.floor(this._totalSize / this._pageSize);
   // console.log(num);
   return num;
 }
 
-DataTableView.prototype._adjustNextSetClasses = function() {
+DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   console.log('adjustNextSetClasses');
+  // var goto = this.getPageNumberSrcolling(scrollPosition);
+  // console.log(goto);
 
-  // var heightToAdd = this._sizeRowsTotal - ($('tbody tr').length) * this._sizeRowFirst;
-  // var heightToAdd = Math.max(0, this._sizeRowsTotal - (this._totalSize - 1.5 * this._pageSize) * this._sizeRowFirst);
-  var heightToAdd = Math.max(0, this._sizeRowsTotal - (this._totalSize) * this._sizeRowFirst);
+  // var heightToAddBottom = this._sizeRowsTotal - ($('tbody tr').length) * this._sizeRowFirst;
+  // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize - 1.5 * this._pageSize) * this._sizeRowFirst);
+  // var heightToAddTop = (goto) * this._sizeSinglePage;
+  // var  heightToAddTop = (start - this._pageSize) * this._sizeRowFirst;
+  if(top) {
+    this._pageStart = start;
+    // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
+  }
+  var  heightToAddTop = (this._pageStart) * this._sizeRowFirst;
+
+  var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize) * this._sizeRowFirst);
   // console.log(this._sizeRowFirst + ' ' + this._sizeRowsTotal);
-  console.log(heightToAdd + ' ' + (this._totalSize - 1.5 * this._pageSize) + ' ' + (this._totalSize - 1.5 * this._pageSize) * this._sizeRowFirst);
+  // console.log(heightToAddBottom + ' ' + (this._totalSize - 1.5 * this._pageSize) + ' ' + (this._totalSize - 1.5 * this._pageSize) * this._sizeRowFirst);
   // document.querySelector('tbody').insertRow(0);
+  $('tbody tr:first').css('height', heightToAddTop);
+  // if($('tbody tr').length > 102 && goto > 0 && scrollPosition > (goto) * this._sizeSinglePage) {
+  //   // console.log('Deleting');
+  //   $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
+  //   // console.log($('tbody tr').length - this._pageSize);
+  // }
+
+  if($('tbody tr').length > 102 && start > 100 && top == null) {
+    console.log('Deleting');
+    // $('tbody tr').slice(1, $('tbody tr').length - (start /*- this._pageSize*/)).remove();
+    $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
+    this._pageStart = start - this._pageSize;
+    // console.log($('tbody tr').length - this._pageSize);
+  }
+
+  // $('tbody tr:first').css('height', heightToAddTop);
+
   // if(this._totalSize < theProject.rowModel.total) {
     document.querySelector('.data-table').insertRow();
-    $('tr:last').css('height', heightToAdd);
+    $('tr:last').css('height', heightToAddBottom);
     $('tr:last').addClass('last-row');
   // }
   // $('tr:nth-last-child(50)').addClass('load-next-set');
+  // $("tbody tr:nth-child(50n + 1):not(:first, :last)").addClass('load-next-set');
   if (theProject.rowModel.mode == "record-based") {
-    $('tr.record').eq(-51).addClass('load-next-set')
+    $('tr.record').eq(-51).addClass('load-next-set');
+    $('tr.record').eq(51).addClass('load-next-set');
   } else {
-    $('tr').eq(-52).addClass('load-next-set')
+    $('tr').eq(-52).addClass('load-next-set');
+    $('tr').eq(51).addClass('load-next-set');
   }
   
+  console.log(this._pageStart);
   // var observer = new IntersectionObserver(function(entries) {
   //   console.log(entries);
   //   // console.log(entries[0]['intersectionRatio'] > 0);
@@ -586,7 +669,7 @@ DataTableView.prototype._adjustNextSetClasses = function() {
   // observer.observe(document.querySelector(".load-next-set"));
 }
 
-DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition) {
+DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
   console.log('adjustNextSetClassesSpeed');
 
   var heightToAddTop = modifiedScrollPosition;
@@ -597,6 +680,7 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   $('tbody tr').slice(1, $('tbody tr').length - this._pageSize).remove();
 
   $('tbody tr:first').css('height', heightToAddTop);
+  this._pageStart = start;
 
   // if(this._totalSize < theProject.rowModel.total) {
     document.querySelector('.data-table').insertRow();
@@ -608,6 +692,7 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   } else {
     $('tr').eq(-52).addClass('load-next-set')
   }
+  console.log(this._pageStart);
 };
 
 var setScroll = function(scrollPosition) {
@@ -629,12 +714,12 @@ DataTableView.prototype._showRows = function(start, onDone) {
   }, this._sorting);
 };
 
-DataTableView.prototype._showRowsBottom = function(table, start, onDone) {
+DataTableView.prototype._showRowsBottom = function(scrollPosition, table, start, onDone) {
   console.log('_showRowsBottom');
   var self = this;
 
   this._totalSize = start + this._pageSize;
-  // console.log(this._totalSize);
+  console.log(start);
   $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
@@ -642,7 +727,29 @@ DataTableView.prototype._showRowsBottom = function(table, start, onDone) {
     $('.last-row').remove();
 
     loadRows();
-    self._adjustNextSetClasses();
+    self._adjustNextSetClasses(start);
+    
+    if (onDone) {
+      onDone();
+    }
+  }, this._sorting);
+};
+
+DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, onDone) {
+  console.log('_showRowsTop');
+  var self = this;
+
+  this._totalSize = start + this._pageSize;
+  console.log(start);
+  // var starting = start;
+  $('tr.load-next-set').removeClass('load-next-set');
+
+  Refine.fetchRows(start, this._pageSize, function() {
+    // table.deleteRow(table.rows.length - 1);
+    $('.last-row').remove();
+
+    loadRows(start);
+    self._adjustNextSetClasses(start, true);
     
     if (onDone) {
       onDone();
@@ -655,7 +762,8 @@ DataTableView.prototype._showRowsBottomSpeed = function(modifiedScrollPosition, 
   var self = this;
 
   this._totalSize = start +  this._pageSize;
-  console.log(this._totalSize);
+  console.log(start);
+  // console.log(this._totalSize);
   $('tr.load-next-set').removeClass('load-next-set');
 
   // $('table').remove();
@@ -673,7 +781,7 @@ DataTableView.prototype._showRowsBottomSpeed = function(modifiedScrollPosition, 
     $('.last-row').remove();
 
     loadRows();
-    self._adjustNextSetClassesSpeed(modifiedScrollPosition);
+    self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
     setScroll(scrollPosition);
     
     if (onDone) {
@@ -741,11 +849,20 @@ DataTableView.prototype._onClickNextPage = function(elmt, evt) {
   this._showRows(theProject.rowModel.start + this._pageSize);
 };
 
-DataTableView.prototype._onBottomTable = function(table, elmt, evt) {
-  // console.log(elmt);
+DataTableView.prototype._onBottomTable = function(scrollPosition, table, elmt, evt) {
+  // console.log('_onBottomTable');
   // console.log(this._totalSize + this._pageSize);
   // if(this._totalSize < theProject.rowModel.total) {
-    this._showRowsBottom(table, theProject.rowModel.start + this._pageSize);
+    this._showRowsBottom(scrollPosition, table, theProject.rowModel.start + this._pageSize);
+  // }
+};
+
+DataTableView.prototype._onTopTable = function(scrollPosition, table, elmt, evt) {
+  // console.log('_onTopTable');
+  // console.log(theProject.rowModel.start + ' ' + (theProject.rowModel.start - 2 * this._pageSize));
+  // if(this._totalSize < theProject.rowModel.total) {
+    // this._showRowsTop(scrollPosition, table, theProject.rowModel.start - 2 * this._pageSize);
+    this._showRowsTop(scrollPosition, table, this._pageStart - this._pageSize);
   // }
 };
 
