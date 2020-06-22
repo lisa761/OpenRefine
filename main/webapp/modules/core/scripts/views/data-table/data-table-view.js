@@ -651,7 +651,7 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   // }
 
   if($('tbody tr').length > 102 && start > 100 && top == null) {
-    console.log('Deleting abover rows');
+    console.log('Deleting above rows');
     // $('tbody tr').slice(1, $('tbody tr').length - (start /*- this._pageSize*/)).remove();
     $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
     this._pageStart = start - this._pageSize;
