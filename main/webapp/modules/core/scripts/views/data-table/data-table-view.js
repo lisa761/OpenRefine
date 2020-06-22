@@ -521,6 +521,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   }
   loadRows();
 
+  var flag = true;
   $(table.parentNode.parentNode).bind('scroll', function(evt) {
 
     // console.log($(this).scrollTop());
@@ -528,9 +529,9 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     self._downwardDirection = self._scrollTop < $(this).scrollTop();
     // console.log(self._scrollTop + ' ' + $(this).scrollTop() + ' ' + self._downwardDirection);
     // console.log(self._downwardDirection);
-    self._scrollTop = $(this).scrollTop();
+    // self._scrollTop = $(this).scrollTop();
     // console.log(scrollTop);
-
+    // flag = false;
     var element = document.querySelectorAll('.load-next-set');
     element = element[element.length - 1];
     var position = element.getBoundingClientRect();
@@ -540,7 +541,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     var positionLastElement = lastElement.getBoundingClientRect();
     var firstElement = document.querySelector('.first-row');
     var positionFirstElement = firstElement.getBoundingClientRect();
-    // console.log(positionLastElement.top);
+    // console.log(positionLastElement.top + ' ' + positionLastElement.bottom);
     // if((position.top >= 0 && position.bottom <= window.innerHeight) || 
     //   (positionLastElement.top < window.innerHeight && positionLastElement.top > 0  && positionLastElement.bottom + 50 >= window.innerHeight)) {
     //   console.log('Loading next set');
@@ -548,18 +549,31 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     // }
 
     // if(position.top >= 0 && position.bottom <= window.innerHeight) {
-      if(self._downwardDirection) {
-        if((position.top >= 0 && position.bottom <= window.innerHeight) || 
-          (positionLastElement.top < window.innerHeight && positionLastElement.top > 0  && positionLastElement.bottom + 50 >= window.innerHeight)) {
-          console.log('Loading next set');
-          self._onBottomTable(self._scrollTop, table, this, evt);
-        }
+    if(self._downwardDirection && flag) {
+      // console.log('Here');
+      if((position.top >= 0 && position.bottom <= window.innerHeight) || 
+        (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
+        console.log('Loading next set');
+        flag = true;
+        self._onBottomTable(self._scrollTop, table, this, evt);
       }
+    }
     // }
-    if(position2.top >= 0 && position2.bottom <= window.innerHeight) {
-      // console.log(self._scrollTop > $(this).scrollTop() + 10);
-      if(!self._downwardDirection && self._scrollTop < $(this).scrollTop() + 10) {
+    // if(position2.top >= 0 && position2.bottom <= window.innerHeight) {
+    //   // console.log(self._scrollTop > $(this).scrollTop() + 10);
+    //   if(!self._downwardDirection && self._scrollTop < $(this).scrollTop() + 10) {
+    //     console.log('Loading upper set');
+    //     // self._onTopTable(self._scrollTop, table, this, evt);
+    //   }
+    // }
+
+    // if(!self._downwardDirection && self._scrollTop < $(this).scrollTop() + 10) {
+    if(!self._downwardDirection) {
+      // console.log('Here');
+      if(position2.top >= 0 && position2.bottom <= window.innerHeight || 
+        (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
         console.log('Loading upper set');
+        flag = false;
         self._onTopTable(self._scrollTop, table, this, evt);
       }
     }
@@ -572,14 +586,17 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         var goto = self.getPageNumberSrcolling(self._scrollTop);
         console.log(goto + ' ' + self._scrollTop);
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
+        // setScroll(self._scrollTop);
       }
       
-      if(positionFirstElement.top <= 150 && positionFirstElement.bottom >= window.innerHeight) {
+      if(positionFirstElement.top < 0 && positionFirstElement.bottom >= window.innerHeight) {
         console.log('First row is partially visible in screen');
         var goto = self.getPageNumberSrcolling(self._scrollTop);
         console.log(goto + ' ' + self._scrollTop);
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
+        // setScroll(self._scrollTop);
       }
+      flag = true;
 
       // if(position2.top >= 0 && position2.bottom <= window.innerHeight) {
       //   if(!self._downwardDirection && self._scrollTop <= $(this).scrollTop() + 50) {
@@ -590,6 +607,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       // }
       // console.log("Haven't scrolled in 250ms!");
     }, 250));
+    self._scrollTop = $(this).scrollTop();
   });
 };
 
@@ -603,24 +621,29 @@ DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition) {
 
 DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   console.log('adjustNextSetClasses');
-  // var goto = this.getPageNumberSrcolling(scrollPosition);
-  // console.log(goto);
-
   // var heightToAddBottom = this._sizeRowsTotal - ($('tbody tr').length) * this._sizeRowFirst;
   // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize - 1.5 * this._pageSize) * this._sizeRowFirst);
   // var heightToAddTop = (goto) * this._sizeSinglePage;
   // var  heightToAddTop = (start - this._pageSize) * this._sizeRowFirst;
-  if(top) {
-    this._pageStart = start;
-    // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
-  }
-  var  heightToAddTop = (this._pageStart) * this._sizeRowFirst;
+  // if(top) {
+  //   this._pageStart = start;
+  //   heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._pageStart + 2 * this._pageSize) * this._sizeRowFirst);
+  //   // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
+  // }
+  // var heightToAddTop = (this._pageStart) * this._sizeRowFirst;
+  // console.log(heightToAddTop);
 
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize) * this._sizeRowFirst);
+  if(top) {
+    this._pageStart = start;
+    heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._pageStart + 2 * this._pageSize) * this._sizeRowFirst);
+    // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
+  }
+  // console.log(heightToAddBottom + ' ' + this._totalSize);
   // console.log(this._sizeRowFirst + ' ' + this._sizeRowsTotal);
   // console.log(heightToAddBottom + ' ' + (this._totalSize - 1.5 * this._pageSize) + ' ' + (this._totalSize - 1.5 * this._pageSize) * this._sizeRowFirst);
   // document.querySelector('tbody').insertRow(0);
-  $('tbody tr:first').css('height', heightToAddTop);
+  // $('tbody tr:first').css('height', heightToAddTop);
   // if($('tbody tr').length > 102 && goto > 0 && scrollPosition > (goto) * this._sizeSinglePage) {
   //   // console.log('Deleting');
   //   $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
@@ -628,12 +651,25 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   // }
 
   if($('tbody tr').length > 102 && start > 100 && top == null) {
-    console.log('Deleting');
+    console.log('Deleting abover rows');
     // $('tbody tr').slice(1, $('tbody tr').length - (start /*- this._pageSize*/)).remove();
     $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
     this._pageStart = start - this._pageSize;
     // console.log($('tbody tr').length - this._pageSize);
   }
+  if($('tbody tr').length > 201 && top) {
+    console.log('Deleting below rows');
+    // $('tbody tr').slice(1, $('tbody tr').length - (start /*- this._pageSize*/)).remove();
+    $('tbody tr').slice(201, $('tbody tr').length).remove();
+    // heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._pageStart + 2 * this._pageSize) * this._sizeRowFirst);
+    // this._pageStart = start - this._pageSize;
+    // console.log($('tbody tr').length - this._pageSize);
+  }
+
+
+  var heightToAddTop = (this._pageStart) * this._sizeRowFirst;
+  console.log(heightToAddTop + ' ' + heightToAddBottom + ' ' + this._sizeRowsTotal);
+  $('tbody tr:first').css('height', heightToAddTop);
 
   // $('tbody tr:first').css('height', heightToAddTop);
 
@@ -671,16 +707,18 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
   console.log('adjustNextSetClassesSpeed');
-
+  this._pageStart = start;
   var heightToAddTop = modifiedScrollPosition;
+  // var heightToAddTop = this._pageStart * this._sizeRowFirst;
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (modifiedScrollPosition + this._sizeSinglePage));
+  // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (heightToAddTop + this._sizeSinglePage));
   console.log((heightToAddTop + heightToAddBottom) + ' ' + heightToAddTop + ' ' + heightToAddBottom
   + ' ' + this._sizeRowsTotal);
 
   $('tbody tr').slice(1, $('tbody tr').length - this._pageSize).remove();
 
   $('tbody tr:first').css('height', heightToAddTop);
-  this._pageStart = start;
+
 
   // if(this._totalSize < theProject.rowModel.total) {
     document.querySelector('.data-table').insertRow();
@@ -860,10 +898,10 @@ DataTableView.prototype._onBottomTable = function(scrollPosition, table, elmt, e
 DataTableView.prototype._onTopTable = function(scrollPosition, table, elmt, evt) {
   // console.log('_onTopTable');
   // console.log(theProject.rowModel.start + ' ' + (theProject.rowModel.start - 2 * this._pageSize));
-  // if(this._totalSize < theProject.rowModel.total) {
+  if(this._pageStart - this._pageSize >= 0) {
     // this._showRowsTop(scrollPosition, table, theProject.rowModel.start - 2 * this._pageSize);
     this._showRowsTop(scrollPosition, table, this._pageStart - this._pageSize);
-  // }
+  }
 };
 
 DataTableView.prototype._onClickFirstPage = function(elmt, evt) {
