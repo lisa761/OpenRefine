@@ -508,7 +508,8 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       var tr;
       if(start != null) {
         // console.log(start + r);
-        tr = table.insertRow(Math.max(0, r + 1));
+        tr = table.insertRow(r + 1);
+        // console.log(r + 2);
       }
       else {
         tr = table.insertRow(table.rows.length);
@@ -612,7 +613,18 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     self._scrollTop = $(this).scrollTop();
   });
 
-  this._sizeRowFirst = $('tr:eq(1)').height();
+  // this._sizeRowFirst = $('tr:eq(1)').height();
+  // this._sizeRowFirst = 31;
+  // var table = document.querySelector("table");
+  var total = 0;
+  for (var i = 1; i < table.rows.length; i++) {
+      row = table.rows[i] 
+      total += row.offsetHeight;
+      // console.log(row);
+  }
+  console.log(i);
+  this._sizeRowFirst = total / 100;
+  console.log(this._sizeRowFirst);
   this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
   // console.log(this._sizeSinglePage);
@@ -825,13 +837,14 @@ DataTableView.prototype._showRowsBottomSpeed = function(modifiedScrollPosition, 
 
   // $("tbody tr").remove();
   // $("table > tbody").empty();
+  // Refine.fetchRows(start, this._pageSize / 2, function() {
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
     $('.last-row').remove();
 
     loadRows();
     self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
-    setScroll(scrollPosition);
+    // setScroll(scrollPosition);
     
     if (onDone) {
       onDone();
@@ -848,7 +861,7 @@ DataTableView.prototype._onChangeGotoScrolling = function(scrollPosition, gotoPa
   var modifiedScrollPosition = this._sizeRowFirst * (gotoPageNumber/* - 1*/) * this._pageSize;
   // console.log(modifiedScrollPosition + ' ' + scrollPosition);
   // if(this._totalSize < theProject.rowModel.total) {
-    this._showRowsBottomSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber - 1) * this._pageSize);
+    this._showRowsBottomSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber/* - 1*/) * this._pageSize);
   // }
 };
 
