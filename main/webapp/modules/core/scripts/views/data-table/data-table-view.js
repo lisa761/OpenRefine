@@ -521,7 +521,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   }
   loadRows();
 
-  var flag = true;
+  var flag = 0;
   $(table.parentNode.parentNode).bind('scroll', function(evt) {
 
     // console.log($(this).scrollTop());
@@ -549,7 +549,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     // }
 
     // if(position.top >= 0 && position.bottom <= window.innerHeight) {
-    if(self._downwardDirection && flag) {
+    if(self._downwardDirection && !flag) {
       // console.log('Here');
       if((position.top >= 0 && position.bottom <= window.innerHeight) || 
         (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
@@ -568,12 +568,12 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     // }
 
     // if(!self._downwardDirection && self._scrollTop < $(this).scrollTop() + 10) {
-    if(!self._downwardDirection) {
+    if(!self._downwardDirection && !flag) {
       // console.log('Here');
       if(position2.top >= 0 && position2.bottom <= window.innerHeight || 
         (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
         console.log('Loading upper set');
-        flag = false;
+        flag = true;
         self._onTopTable(self._scrollTop, table, this, evt);
       }
     }
@@ -596,7 +596,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
         // setScroll(self._scrollTop);
       }
-      flag = true;
+      flag = 0;
 
       // if(position2.top >= 0 && position2.bottom <= window.innerHeight) {
       //   if(!self._downwardDirection && self._scrollTop <= $(this).scrollTop() + 50) {
@@ -688,7 +688,7 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
     $('tr').eq(51).addClass('load-next-set');
   }
   
-  console.log(this._pageStart);
+  console.log(this._pageStart + ' ' + this._totalSize);
   // var observer = new IntersectionObserver(function(entries) {
   //   console.log(entries);
   //   // console.log(entries[0]['intersectionRatio'] > 0);
@@ -730,7 +730,7 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   } else {
     $('tr').eq(-52).addClass('load-next-set')
   }
-  console.log(this._pageStart);
+  console.log(this._pageStart + ' ' + this._totalSize);
 };
 
 var setScroll = function(scrollPosition) {
@@ -777,7 +777,7 @@ DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, on
   console.log('_showRowsTop');
   var self = this;
 
-  this._totalSize = start + this._pageSize;
+  this._totalSize = start + 2 * this._pageSize;
   console.log(start);
   // var starting = start;
   $('tr.load-next-set').removeClass('load-next-set');
@@ -891,7 +891,8 @@ DataTableView.prototype._onBottomTable = function(scrollPosition, table, elmt, e
   // console.log('_onBottomTable');
   // console.log(this._totalSize + this._pageSize);
   // if(this._totalSize < theProject.rowModel.total) {
-    this._showRowsBottom(scrollPosition, table, theProject.rowModel.start + this._pageSize);
+    // this._showRowsBottom(scrollPosition, table, theProject.rowModel.start + this._pageSize);
+    this._showRowsBottom(scrollPosition, table, this._totalSize);
   // }
 };
 
