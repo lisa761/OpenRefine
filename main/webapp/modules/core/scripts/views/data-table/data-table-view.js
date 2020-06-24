@@ -292,6 +292,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
   var columns = theProject.columnModel.columns;
   var columnGroups = theProject.columnModel.columnGroups;
+  console.log(columns.length);
 
   /*------------------------------------------------------------
    *  Column Group Headers
@@ -482,6 +483,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     }
 
     $(tr).addClass(even ? "even" : "odd");
+    // $(tr).css('height', '30px');
 
     for (var i = 0; i < columns.length; i++) {
       var column = columns[i];
@@ -592,7 +594,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         // setScroll(self._scrollTop);
       }
       
-      if(positionFirstElement.top < 0 && positionFirstElement.bottom >= window.innerHeight) {
+      if(positionFirstElement.top < 150 && positionFirstElement.bottom >= window.innerHeight) {
         console.log('First row is partially visible in screen');
         var goto = self.getPageNumberSrcolling(self._scrollTop);
         console.log(goto + ' ' + self._scrollTop);
@@ -617,14 +619,19 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   // this._sizeRowFirst = 31;
   // var table = document.querySelector("table");
   var total = 0;
+  var min = Infinity;
   for (var i = 1; i < table.rows.length; i++) {
       row = table.rows[i] 
       total += row.offsetHeight;
+      if(row.offsetHeight < min) {
+        min = row.offsetHeight;
+        // console.log(row);
+      }
       // console.log(row);
   }
   console.log(i);
-  this._sizeRowFirst = total / 100;
-  console.log(this._sizeRowFirst);
+  this._sizeRowFirst = total / this._pageSize;
+  console.log(this._sizeRowFirst + ' ' + min);
   this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
   // console.log(this._sizeSinglePage);
@@ -659,7 +666,7 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize) * this._sizeRowFirst);
   if(top) {
     this._pageStart = start;
-    heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._pageStart + 2 * this._pageSize) * this._sizeRowFirst);
+    // heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._pageStart + 2 * this._pageSize) * this._sizeRowFirst);
     // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
   }
   // console.log(heightToAddBottom + ' ' + this._totalSize);
@@ -677,6 +684,8 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
     console.log('Deleting above rows');
     // $('tbody tr').slice(1, $('tbody tr').length - (start /*- this._pageSize*/)).remove();
     $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
+    // $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).css('display', 'none');
+    // $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).css('visibility', 'hidden');
     this._pageStart = start - this._pageSize;
     // console.log($('tbody tr').length - this._pageSize);
   }
@@ -781,7 +790,7 @@ DataTableView.prototype._showRowsBottom = function(scrollPosition, table, start,
 
   this._totalSize = start + this._pageSize;
   console.log(start);
-  $('tr.load-next-set').removeClass('load-next-set');
+  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
@@ -803,7 +812,7 @@ DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, on
   this._totalSize = start + 2 * this._pageSize;
   // console.log(start);
   // var starting = start;
-  $('tr.load-next-set').removeClass('load-next-set');
+  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
