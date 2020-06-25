@@ -87,8 +87,8 @@ DataTableView.prototype.getSorting = function() {
 
 DataTableView.prototype.resize = function(table, elmt) {
   // console.log('resize');
-  this._headerTop = $('thead').offset().top + $('thead').height();
-  console.log(this._headerTop);
+  // this._headerTop = $('thead').offset().top + $('thead').height();
+  // console.log(this._headerTop);
   var topHeight =
     this._div.find(".viewpanel-header").outerHeight(true);
   var tableContainerIntendedHeight = this._div.innerHeight() - topHeight;
@@ -284,7 +284,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
   var columns = theProject.columnModel.columns;
   var columnGroups = theProject.columnModel.columnGroups;
-  console.log(columns.length);
+  // console.log(columns.length);
 
   /*------------------------------------------------------------
    *  Column Group Headers
@@ -556,7 +556,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     clearTimeout($.data(this, 'scrollTimer'));
     $.data(this, 'scrollTimer', setTimeout(function() {
       // self._downwardDirection = self._scrollTop < $(this).scrollTop();
-    // console.log(positionFirstElement.top + ' ' + positionFirstElement.bottom + ' thead: ' + ($('.data-table-container').offset().top + $('thead').height()));
+    console.log(positionFirstElement.top + ' ' + positionFirstElement.bottom + ' thead: ' + self._headerTop);
       if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
         console.log('Last row is partially visible in screen');
         var goto = self.getPageNumberSrcolling(self._scrollTop);
@@ -600,7 +600,8 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
   // console.log(this._sizeSinglePage);
   var firstRow = document.querySelector('tbody').insertRow(0).setAttribute('class', 'first-row');
-
+  this._headerTop = $('thead').offset().top + $('thead').height();
+  console.log(this._headerTop);
   this._adjustNextSetClasses();
 
 };
@@ -680,12 +681,12 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   console.log(this._pageStart + ' ' + this._totalSize);
 };
 
-var setScroll = function(scrollPosition) {
-    console.log("setScroll");
-    // console.log(scrollPosition);
-    $('.data-table-container').scrollTop(scrollPosition);
-    // console.log($('.data-table-container').scrollTop());
-};
+// var setScroll = function(scrollPosition) {
+//     console.log("setScroll");
+//     // console.log(scrollPosition);
+//     $('.data-table-container').scrollTop(scrollPosition);
+//     // console.log($('.data-table-container').scrollTop());
+// };
 
 DataTableView.prototype._showRows = function(start, onDone) {
   // console.log('_showRows');
@@ -742,8 +743,8 @@ DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, on
   }, this._sorting);
 };
 
-DataTableView.prototype._showRowsBottomSpeed = function(modifiedScrollPosition, scrollPosition, table, start, onDone) {
-  console.log('_showRowsBottomSpeed');
+DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scrollPosition, table, start, onDone) {
+  console.log('_showRowsSpeed');
   var self = this;
 
   this._totalSize = start +  this._pageSize;
@@ -770,11 +771,11 @@ DataTableView.prototype._onChangeGotoScrolling = function(scrollPosition, gotoPa
   
   this._currentPageNumber = gotoPageNumber;
   // console.log((gotoPageNumber - 1) * this._pageSize);
-  // this._showRowsBottomSpeed(scrollPosition, table, (gotoPageNumber - 1) * this._pageSize);
+  // this._showRowsSpeed(scrollPosition, table, (gotoPageNumber - 1) * this._pageSize);
   var modifiedScrollPosition = this._sizeRowFirst * (gotoPageNumber/* - 1*/) * this._pageSize;
   // console.log(modifiedScrollPosition + ' ' + scrollPosition);
   // if(this._totalSize < theProject.rowModel.total) {
-    this._showRowsBottomSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber/* - 1*/) * this._pageSize);
+    this._showRowsSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber/* - 1*/) * this._pageSize);
   // }
 };
 
