@@ -623,20 +623,30 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
     // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
   }
 
-  if($('tbody tr').length > 102 && start > 100 && top == null) {
+  // if($('tbody tr').length > 102 && start > 100 && top == null) {
+  if($('tbody tr').length > this._pageSize + 2 && start > this._pageSize && top == null) {
     console.log('Deleting above rows');
     $('tbody tr').slice(1, $('tbody tr').length - 2 * this._pageSize).remove();
     this._pageStart = start - this._pageSize;
     // console.log($('tbody tr').length - this._pageSize);
   }
-  if($('tbody tr').length > 201 && top) {
+  // if($('tbody tr').length > 201 && top) {
+  if($('tbody tr').length > 2 * this._pageSize + 1 && top) {
     console.log('Deleting below rows');
-    $('tbody tr').slice(201, $('tbody tr').length).remove();
+    // $('tbody tr').slice(201, $('tbody tr').length).remove();
+    $('tbody tr').slice(2 * this._pageSize + 1, $('tbody tr').length).remove();
   }
 
 
   var heightToAddTop = (this._pageStart) * this._sizeRowFirst;
   console.log(heightToAddTop + ' ' + heightToAddBottom + ' ' + this._sizeRowsTotal);
+  // $('tbody tr:first').css('height', heightToAddTop);
+  this._addHeights(heightToAddTop, heightToAddBottom);
+  
+  console.log(this._pageStart + ' ' + this._totalSize);
+}
+
+DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom) {
   $('tbody tr:first').css('height', heightToAddTop);
 
     document.querySelector('.data-table').insertRow();
@@ -644,28 +654,12 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
     $('tr:last').addClass('last-row');
 
   if (theProject.rowModel.mode == "record-based") {
-    $('tr.record').eq(-51).addClass('load-next-set');
-    $('tr.record').eq(51).addClass('load-next-set');
+    $('tr.record').eq(-1 * (this._pageSize / 2 + 1)).addClass('load-next-set');
+    $('tr.record').eq(this._pageSize / 2 + 1).addClass('load-next-set');
   } else {
-    $('tr').eq(-52).addClass('load-next-set');
-    $('tr').eq(51).addClass('load-next-set');
+    $('tr').eq(-1 * (this._pageSize / 2 + 2)).addClass('load-next-set');
+    $('tr').eq(this._pageSize / 2 + 1).addClass('load-next-set');
   }
-  
-  console.log(this._pageStart + ' ' + this._totalSize);
-  // var observer = new IntersectionObserver(function(entries) {
-  //   console.log(entries);
-  //   // console.log(entries[0]['intersectionRatio'] > 0);
-  //   // if(entries[0].isIntersecting === true)
-  //   if(entries[0]['intersectionRatio'] > 0) {
-  //     console.log('Element is fully visible in screen');
-  //     // var elmt = document.querySelector('.data-table-container');
-  //     // console.log(this._totalSize);
-  //     // DataTableView.prototype._onBottomTable(table, elmt);
-  //     self._onBottomTable(table);
-  //   }
-  // }, { threshold: [0.1] });
-  
-  // observer.observe(document.querySelector(".load-next-set"));
 }
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
@@ -680,19 +674,9 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
 
   $('tbody tr').slice(1, $('tbody tr').length - this._pageSize).remove();
 
-  $('tbody tr:first').css('height', heightToAddTop);
+  // $('tbody tr:first').css('height', heightToAddTop);
+  this._addHeights(heightToAddTop, heightToAddBottom);
 
-
-  // if(this._totalSize < theProject.rowModel.total) {
-    document.querySelector('.data-table').insertRow();
-    $('tr:last').css('height', heightToAddBottom);
-    $('tr:last').addClass('last-row');
-  // }
-  if (theProject.rowModel.mode == "record-based") {
-    $('tr.record').eq(-51).addClass('load-next-set')
-  } else {
-    $('tr').eq(-52).addClass('load-next-set')
-  }
   console.log(this._pageStart + ' ' + this._totalSize);
 };
 
