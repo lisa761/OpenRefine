@@ -52,6 +52,7 @@ function DataTableView(div) {
   this._scrollTop = 0;
   this._downwardDirection;
   this._pageStart = 0;
+  this.__headerTop = 0;
 
   this._currentPageNumber = 1;
   this._showRows(0);
@@ -86,6 +87,8 @@ DataTableView.prototype.getSorting = function() {
 
 DataTableView.prototype.resize = function(table, elmt) {
   // console.log('resize');
+  this._headerTop = $('thead').offset().top + $('thead').height();
+  console.log(this._headerTop);
   var topHeight =
     this._div.find(".viewpanel-header").outerHeight(true);
   var tableContainerIntendedHeight = this._div.innerHeight() - topHeight;
@@ -553,6 +556,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     clearTimeout($.data(this, 'scrollTimer'));
     $.data(this, 'scrollTimer', setTimeout(function() {
       // self._downwardDirection = self._scrollTop < $(this).scrollTop();
+    // console.log(positionFirstElement.top + ' ' + positionFirstElement.bottom + ' thead: ' + ($('.data-table-container').offset().top + $('thead').height()));
       if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
         console.log('Last row is partially visible in screen');
         var goto = self.getPageNumberSrcolling(self._scrollTop);
@@ -561,7 +565,8 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         // setScroll(self._scrollTop);
       }
       
-      if(positionFirstElement.top < 150 && positionFirstElement.bottom >= window.innerHeight) {
+      if(positionFirstElement.top < self._headerTop + 1 && 
+        positionFirstElement.bottom >= window.innerHeight) {
         console.log('First row is partially visible in screen');
         var goto = self.getPageNumberSrcolling(self._scrollTop);
         console.log(goto + ' ' + self._scrollTop);
@@ -761,7 +766,7 @@ DataTableView.prototype._showRowsBottomSpeed = function(modifiedScrollPosition, 
   console.log(start);
   // console.log(this._totalSize);
   $('tr.load-next-set').removeClass('load-next-set');
-  
+
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
     $('.last-row').remove();
