@@ -514,70 +514,68 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   }
   loadRows();
 
-  var flag = 0;
-  $(table.parentNode.parentNode).bind('scroll', function(evt) {
+  // var flag = 0;
+  // $(table.parentNode.parentNode).bind('scroll', function(evt) {
 
-    // console.log($(this).scrollTop());
-    // console.log(self._scrollTop >= $(this).scrollTop());
-    self._downwardDirection = self._scrollTop < $(this).scrollTop();
-    // console.log(self._scrollTop + ' ' + $(this).scrollTop() + ' ' + self._downwardDirection);
-    // console.log(self._downwardDirection);
+  //   // console.log($(this).scrollTop());
+  //   // console.log(self._scrollTop >= $(this).scrollTop());
+  //   self._downwardDirection = self._scrollTop < $(this).scrollTop();
+  //   // console.log(self._scrollTop + ' ' + $(this).scrollTop() + ' ' + self._downwardDirection);
+  //   // console.log(self._downwardDirection);
 
-    var element = document.querySelectorAll('.load-next-set');
-    element = element[element.length - 1];
-    var position = element.getBoundingClientRect();
-    var element2 = document.querySelector('.load-next-set');
-    var position2 = element2.getBoundingClientRect();
-    var lastElement = document.querySelector('.last-row');
-    var positionLastElement = lastElement.getBoundingClientRect();
-    var firstElement = document.querySelector('.first-row');
-    var positionFirstElement = firstElement.getBoundingClientRect();
+  //   var element = document.querySelectorAll('.load-next-set');
+  //   element = element[element.length - 1];
+  //   var position = element.getBoundingClientRect();
+  //   var element2 = document.querySelector('.load-next-set');
+  //   var position2 = element2.getBoundingClientRect();
+  //   var lastElement = document.querySelector('.last-row');
+  //   var positionLastElement = lastElement.getBoundingClientRect();
+  //   var firstElement = document.querySelector('.first-row');
+  //   var positionFirstElement = firstElement.getBoundingClientRect();
 
-    if(self._downwardDirection && !flag) {
-      // console.log('Here');
-      if((position.top >= 0 && position.bottom <= window.innerHeight) || 
-        (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
-        console.log('Loading next set');
-        flag = true;
-        self._onBottomTable(self._scrollTop, table, this, evt);
-      }
-    }
+  //   if(self._downwardDirection && !flag) {
+  //     // console.log('Here');
+  //     if((position.top >= 0 && position.bottom <= window.innerHeight) || 
+  //       (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
+  //       console.log('Loading next set');
+  //       flag = true;
+  //       self._onBottomTable(self._scrollTop, table, this, evt);
+  //     }
+  //   }
 
-    if(!self._downwardDirection && !flag) {
-      // console.log('Here');
-      if(position2.top >= 0 && position2.bottom <= window.innerHeight || 
-        (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
-        console.log('Loading upper set');
-        flag = true;
-        self._onTopTable(self._scrollTop, table, this, evt);
-      }
-    }
-    // console.log(positionLastElement.top + ' ' + positionLastElement.bottom + ' \n ' + positionFirstElement.top + ' ' + positionFirstElement.bottom);
-    clearTimeout($.data(this, 'scrollTimer'));
-    $.data(this, 'scrollTimer', setTimeout(function() {
-      // self._downwardDirection = self._scrollTop < $(this).scrollTop();
-    console.log(positionFirstElement.top + ' ' + positionFirstElement.bottom + ' thead: ' + self._headerTop);
-      if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
-        console.log('Last row is partially visible in screen');
-        var goto = self.getPageNumberSrcolling(self._scrollTop);
-        console.log(goto + ' ' + self._scrollTop);
-        self._onChangeGotoScrolling(self._scrollTop, goto, table);
-        // setScroll(self._scrollTop);
-      }
+  //   if(!self._downwardDirection && !flag) {
+  //     // console.log('Here');
+  //     if(position2.top >= 0 && position2.bottom <= window.innerHeight || 
+  //       (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
+  //       console.log('Loading upper set');
+  //       flag = true;
+  //       self._onTopTable(self._scrollTop, table, this, evt);
+  //     }
+  //   }
+  //   // console.log(positionLastElement.top + ' ' + positionLastElement.bottom + ' \n ' + positionFirstElement.top + ' ' + positionFirstElement.bottom);
+  //   clearTimeout($.data(this, 'scrollTimer'));
+  //   $.data(this, 'scrollTimer', setTimeout(function() {
+  //     // self._downwardDirection = self._scrollTop < $(this).scrollTop();
+  //   // console.log(positionFirstElement.top + ' ' + positionFirstElement.bottom + ' thead: ' + self._headerTop);
+  //     if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
+  //       console.log('Last row is partially visible in screen');
+  //       var goto = self.getPageNumberSrcolling(self._scrollTop);
+  //       console.log(goto + ' ' + self._scrollTop);
+  //       self._onChangeGotoScrolling(self._scrollTop, goto, table);
+  //     }
       
-      if(positionFirstElement.top < self._headerTop + 1 && 
-        positionFirstElement.bottom >= window.innerHeight) {
-        console.log('First row is partially visible in screen');
-        var goto = self.getPageNumberSrcolling(self._scrollTop);
-        console.log(goto + ' ' + self._scrollTop);
-        self._onChangeGotoScrolling(self._scrollTop, goto, table);
-        // setScroll(self._scrollTop);
-      }
-      flag = 0;
+  //     if(positionFirstElement.top < self._headerTop + 1 && 
+  //       positionFirstElement.bottom >= window.innerHeight) {
+  //       console.log('First row is partially visible in screen');
+  //       var goto = self.getPageNumberSrcolling(self._scrollTop);
+  //       console.log(goto + ' ' + self._scrollTop);
+  //       self._onChangeGotoScrolling(self._scrollTop, goto, table);
+  //     }
+  //     flag = 0;
 
-    }, 250));
-    self._scrollTop = $(this).scrollTop();
-  });
+  //   }, 250));
+  //   self._scrollTop = $(this).scrollTop();
+  // });
 
   // this._sizeRowFirst = $('tr:eq(1)').height();
   // this._sizeRowFirst = 31;
@@ -602,7 +600,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   var firstRow = document.querySelector('tbody').insertRow(0).setAttribute('class', 'first-row');
   this._headerTop = $('thead').offset().top + $('thead').height();
   console.log(this._headerTop);
-  this._adjustNextSetClasses();
+  this._adjustNextSetClasses(null, null, table);
 
 };
 
@@ -614,7 +612,7 @@ DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition) {
   return num;
 }
 
-DataTableView.prototype._adjustNextSetClasses = function(start, top) {
+DataTableView.prototype._adjustNextSetClasses = function(start, top, table) {
   console.log('adjustNextSetClasses');
 
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize) * this._sizeRowFirst);
@@ -645,6 +643,56 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   this._addHeights(heightToAddTop, heightToAddBottom);
   
   console.log(this._pageStart + ' ' + this._totalSize);
+  this._intersection(table);
+};
+
+DataTableView.prototype._intersection = function(table) {
+  var self = this;
+  window.element = document.querySelectorAll('.load-next-set');
+  element = element[element.length - 1];
+  // var position = element.getBoundingClientRect();
+  window.element2 = document.querySelector('.load-next-set');
+  // var position2 = element2.getBoundingClientRect();
+  var lastElement = document.querySelector('.last-row');
+  // var positionLastElement = lastElement.getBoundingClientRect();
+  var firstElement = document.querySelector('.first-row');
+  // var positionFirstElement = firstElement.getBoundingClientRect();
+
+  window.observer = new IntersectionObserver(function(entries) {
+    console.log(entries);
+    // console.log(entries[0]['intersectionRatio'] > 0);
+    // if(entries[0].isIntersecting === true)
+    if(entries[0]['intersectionRatio'] > 0) {
+      console.log('Element is fully visible in screen');
+      // var elmt = document.querySelector('.data-table-container');
+      // console.log(this._totalSize);
+      // DataTableView.prototype._onBottomTable(table, elmt);
+      self._onBottomTable(table);
+    }
+    if(entries[1]['intersectionRatio'] > 0) {
+      console.log('Element is fully visible in screen');
+      // var elmt = document.querySelector('.data-table-container');
+      // console.log(this._totalSize);
+      // DataTableView.prototype._onBottomTable(table, elmt);
+      self._onTopTable(table);
+    }
+  }, { threshold: [0.1] });
+  // window.observer = new IntersectionObserver(function(entries) {
+  //   // console.log(entries);
+  //   // console.log(entries[0]['intersectionRatio'] > 0);
+  //   // if(entries[0].isIntersecting === true)
+  //   if(entries[0]['intersectionRatio'] > 0) {
+  //     console.log('Element is fully visible in screen');
+  //     // var elmt = document.querySelector('.data-table-container');
+  //     // console.log(this._totalSize);
+  //     // DataTableView.prototype._onBottomTable(table, elmt);
+  //     self._onBottomTable(table);
+  //   }
+  // }, { threshold: [0.1] });
+  
+  // observer.observe(element, element2);
+  observer.observe(element);
+  observer.observe(element2);
 }
 
 DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom) {
@@ -661,7 +709,7 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
     $('tr').eq(-1 * (this._pageSize / 2 + 2)).addClass('load-next-set');
     $('tr').eq(this._pageSize / 2 + 1).addClass('load-next-set');
   }
-}
+};
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
   console.log('adjustNextSetClassesSpeed');
@@ -707,6 +755,7 @@ DataTableView.prototype._showRowsBottom = function(scrollPosition, table, start,
   this._totalSize = start + this._pageSize;
   console.log(start);
   // $('tr.load-next-set').removeClass('load-next-set');
+  observer.unobserve(element);
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
@@ -729,6 +778,7 @@ DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, on
   // console.log(start);
   // var starting = start;
   // $('tr.load-next-set').removeClass('load-next-set');
+  observer.unobserve(element2);
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
@@ -750,7 +800,7 @@ DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scroll
   this._totalSize = start +  this._pageSize;
   console.log(start);
   // console.log(this._totalSize);
-  $('tr.load-next-set').removeClass('load-next-set');
+  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
