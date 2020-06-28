@@ -658,41 +658,34 @@ DataTableView.prototype._intersection = function(table) {
   var firstElement = document.querySelector('.first-row');
   // var positionFirstElement = firstElement.getBoundingClientRect();
 
-  window.observer = new IntersectionObserver(function(entries) {
-    console.log(entries);
+  window.observer1 = new IntersectionObserver(function(entries) {
+    // console.log(entries);
     // console.log(entries[0]['intersectionRatio'] > 0);
     // if(entries[0].isIntersecting === true)
     if(entries[0]['intersectionRatio'] > 0) {
-      console.log('Element is fully visible in screen');
+      console.log('Bottom element is fully visible in screen');
       // var elmt = document.querySelector('.data-table-container');
       // console.log(this._totalSize);
       // DataTableView.prototype._onBottomTable(table, elmt);
       self._onBottomTable(table);
     }
-    if(entries[1]['intersectionRatio'] > 0) {
-      console.log('Element is fully visible in screen');
+  }, { threshold: [0.1] });
+  window.observer2 = new IntersectionObserver(function(entries) {
+    // console.log(entries);
+    // console.log(entries[0]['intersectionRatio'] > 0);
+    // if(entries[0].isIntersecting === true)
+    if(entries[0]['intersectionRatio'] > 0) {
+      console.log('Top element is fully visible in screen');
       // var elmt = document.querySelector('.data-table-container');
       // console.log(this._totalSize);
       // DataTableView.prototype._onBottomTable(table, elmt);
       self._onTopTable(table);
     }
   }, { threshold: [0.1] });
-  // window.observer = new IntersectionObserver(function(entries) {
-  //   // console.log(entries);
-  //   // console.log(entries[0]['intersectionRatio'] > 0);
-  //   // if(entries[0].isIntersecting === true)
-  //   if(entries[0]['intersectionRatio'] > 0) {
-  //     console.log('Element is fully visible in screen');
-  //     // var elmt = document.querySelector('.data-table-container');
-  //     // console.log(this._totalSize);
-  //     // DataTableView.prototype._onBottomTable(table, elmt);
-  //     self._onBottomTable(table);
-  //   }
-  // }, { threshold: [0.1] });
   
   // observer.observe(element, element2);
-  observer.observe(element);
-  observer.observe(element2);
+  observer1.observe(element);
+  observer2.observe(element2);
 }
 
 DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom) {
@@ -755,7 +748,7 @@ DataTableView.prototype._showRowsBottom = function(scrollPosition, table, start,
   this._totalSize = start + this._pageSize;
   console.log(start);
   // $('tr.load-next-set').removeClass('load-next-set');
-  observer.unobserve(element);
+  observer1.unobserve(element);
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
@@ -778,7 +771,7 @@ DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, on
   // console.log(start);
   // var starting = start;
   // $('tr.load-next-set').removeClass('load-next-set');
-  observer.unobserve(element2);
+  observer2.unobserve(element2);
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
