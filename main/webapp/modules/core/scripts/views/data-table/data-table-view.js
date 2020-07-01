@@ -104,7 +104,7 @@ DataTableView.prototype.update = function(onDone) {
 };
 
 DataTableView.prototype.render = function() {
-  // console.log('render');
+  console.log('render');
   var self = this;
 
   var oldTableDiv = this._div.find(".data-table-container");
@@ -280,6 +280,7 @@ DataTableView.prototype._checkPaginationSize = function(gridPageSize, defaultGri
 };
 
 DataTableView.prototype._renderDataTables = function(table, tableHeader) {
+  console.log("_renderDataTables");
   var self = this;
 
   var columns = theProject.columnModel.columns;
@@ -594,7 +595,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       }
       // console.log(row);
   }
-  console.log(i);
+  // console.log(i);
   this._sizeRowFirst = total / this._pageSize;
   console.log(this._sizeRowFirst + ' ' + min);
   this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
