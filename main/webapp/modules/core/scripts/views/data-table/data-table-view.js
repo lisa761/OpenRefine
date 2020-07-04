@@ -417,9 +417,15 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   var renderRow = function(tr, r, row, even) {
     // console.log(JSON.stringify(tr) + ' ' + r + ' ' + JSON.stringify(row) + ' ' + even);
     console.log('renderRow');
-    $(tr).empty();
+    // $(tr).empty();
     var cells = row.cells;
     var tdStar = tr.insertCell(tr.cells.length);
+    // $(tr.appendChild(document.createElement("th"))).attr('colspan', '3');
+    // var a = document.createElement('a');
+    // a.classList.add(row.starred ? "data-table-star-on" : "data-table-star-off");
+    // a.href = 'javascript:{}';
+    // tdStar.appendChild(a).appendChild(document.createTextNode('\u00A0'));
+
     var star = $('<a href="javascript:{}">&nbsp;</a>')
     .addClass(row.starred ? "data-table-star-on" : "data-table-star-off")
     .appendTo(tdStar)
