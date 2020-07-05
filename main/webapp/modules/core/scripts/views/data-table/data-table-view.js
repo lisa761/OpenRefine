@@ -648,6 +648,11 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top, table) {
 
 DataTableView.prototype._intersection = function(table) {
   var self = this;
+  var flag = false;
+  // self._downwardDirection = self._scrollTop < $('.data-table-container').scrollTop();
+  // self._scrollTop = $('.data-table-container').scrollTop();
+  // self._downwardDirection = self._scrollTop < $(this).scrollTop();
+  // console.log(self._scrollTop + ' ' + self._downwardDirection);
   window.element = document.querySelectorAll('.load-next-set');
   element = element[element.length - 1];
   // var position = element.getBoundingClientRect();
@@ -659,33 +664,62 @@ DataTableView.prototype._intersection = function(table) {
   // var positionFirstElement = firstElement.getBoundingClientRect();
 
   window.observer1 = new IntersectionObserver(function(entries) {
-    // console.log(entries);
-    // console.log(entries[0]['intersectionRatio'] > 0);
-    // if(entries[0].isIntersecting === true)
-    if(entries[0]['intersectionRatio'] > 0) {
+    self._downwardDirection = self._scrollTop < $('.data-table-container').scrollTop();
+    console.log(self._scrollTop);
+    self._scrollTop = $('.data-table-container').scrollTop();
+    console.log(self._scrollTop + ' ' + self._downwardDirection);
+    if(entries[0]['intersectionRatio'] > 0 && self._downwardDirection) {
       console.log('Bottom element is fully visible in screen');
-      // var elmt = document.querySelector('.data-table-container');
-      // console.log(this._totalSize);
-      // DataTableView.prototype._onBottomTable(table, elmt);
       self._onBottomTable(table);
+      flag = true;
     }
   }, { threshold: [0.1] });
   window.observer2 = new IntersectionObserver(function(entries) {
-    // console.log(entries);
-    // console.log(entries[0]['intersectionRatio'] > 0);
-    // if(entries[0].isIntersecting === true)
-    if(entries[0]['intersectionRatio'] > 0) {
+    self._downwardDirection = self._scrollTop <= $('.data-table-container').scrollTop();
+    console.log(self._scrollTop);
+    self._scrollTop = $('.data-table-container').scrollTop();
+    console.log(self._scrollTop + ' ' + self._downwardDirection);
+    if(entries[0]['intersectionRatio'] > 0 && !self._downwardDirection) {
       console.log('Top element is fully visible in screen');
-      // var elmt = document.querySelector('.data-table-container');
-      // console.log(this._totalSize);
-      // DataTableView.prototype._onBottomTable(table, elmt);
       self._onTopTable(table);
+      flag = true;
     }
   }, { threshold: [0.1] });
-  
+  window.observer3 = new IntersectionObserver(function(entries) {
+    // self._downwardDirection = self._scrollTop <= $('.data-table-container').scrollTop();
+    // console.log(self._scrollTop);
+    self._scrollTop = $('.data-table-container').scrollTop();
+    // console.log(self._scrollTop + ' ' + self._downwardDirection);
+    if(entries[0]['intersectionRatio'] > 0 && firstElement.offsetHeight > 0) {
+      console.log('First row is visible in screen');
+      var goto = self.getPageNumberSrcolling(self._scrollTop);
+      console.log(goto + ' ' + self._scrollTop);
+      self._onChangeGotoScrolling(self._scrollTop, goto, table);
+      flag = false;
+    }
+  }, { threshold: [0.00001] });
+  window.observer4 = new IntersectionObserver(function(entries) {
+    // self._downwardDirection = self._scrollTop <= $('.data-table-container').scrollTop();
+    // console.log(self._scrollTop);
+    self._scrollTop = $('.data-table-container').scrollTop();
+    // console.log(self._scrollTop + ' ' + self._downwardDirection);
+    if(entries[0]['intersectionRatio'] > 0) {
+      console.log('Last row is visible in screen');
+      var goto = self.getPageNumberSrcolling(self._scrollTop);
+      console.log(goto + ' ' + self._scrollTop);
+      self._onChangeGotoScrolling(self._scrollTop, goto, table);
+      flag = false;
+    }
+  }, { threshold: [0.00001] });
+  // setTimeout(function() {
+  //   console.log("here");
+  //   flag = false;
+  // }, 10)
   // observer.observe(element, element2);
   observer1.observe(element);
   observer2.observe(element2);
+  observer3.observe(firstElement);
+  observer4.observe(lastElement);
 }
 
 DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom) {
@@ -704,7 +738,7 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
   }
 };
 
-DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
+DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start, table) {
   console.log('adjustNextSetClassesSpeed');
   this._pageStart = start;
   var heightToAddTop = modifiedScrollPosition;
@@ -720,6 +754,7 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   this._addHeights(heightToAddTop, heightToAddBottom);
 
   console.log(this._pageStart + ' ' + this._totalSize);
+  this._intersection(table);
 };
 
 // var setScroll = function(scrollPosition) {
