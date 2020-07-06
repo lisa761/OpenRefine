@@ -658,9 +658,9 @@ DataTableView.prototype._intersection = function(table) {
   // var position = element.getBoundingClientRect();
   window.element2 = document.querySelector('.load-next-set');
   // var position2 = element2.getBoundingClientRect();
-  var lastElement = document.querySelector('.last-row');
+  window.lastElement = document.querySelector('.last-row');
   // var positionLastElement = lastElement.getBoundingClientRect();
-  var firstElement = document.querySelector('.first-row');
+  window.firstElement = document.querySelector('.first-row');
   // var positionFirstElement = firstElement.getBoundingClientRect();
 
   window.observer1 = new IntersectionObserver(function(entries) {
@@ -829,6 +829,8 @@ DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scroll
   console.log(start);
   // console.log(this._totalSize);
   // $('tr.load-next-set').removeClass('load-next-set');
+  observer3.unobserve(firstElement);
+  observer4.unobserve(lastElement);
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
