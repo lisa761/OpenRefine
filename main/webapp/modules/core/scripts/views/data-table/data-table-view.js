@@ -682,8 +682,9 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (heightToAddTop + this._sizeSinglePage));
   // console.log((heightToAddTop + heightToAddBottom) + ' ' + heightToAddTop + ' ' + heightToAddBottom
   // + ' ' + this._sizeRowsTotal);
-
-  $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - this._pageSize).remove();
+  // console.log($('.data-table tbody tr').length + ' ' + this._pageSize);
+  // $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - this._pageSize).remove();
+  $('.data-table tbody tr').slice(1, this._pageSize + 1).remove();
 
   // $('.data-table tbody tr:first').css('height', heightToAddTop);
   this._addHeights(heightToAddTop, heightToAddBottom);
