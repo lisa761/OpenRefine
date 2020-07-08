@@ -591,15 +591,15 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       }
       // console.log(row);
   }
-  console.log(i);
+  // console.log(i);
   this._sizeRowFirst = total / this._pageSize;
-  console.log(this._sizeRowFirst + ' ' + min);
+  // console.log(this._sizeRowFirst + ' ' + min);
   this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
   // console.log(this._sizeSinglePage);
   var firstRow = document.querySelector('tbody').insertRow(0).setAttribute('class', 'first-row');
   this._headerTop = $('thead').offset().top + $('thead').height();
-  console.log(this._headerTop);
+  // console.log(this._headerTop);
   this._adjustNextSetClasses(null, null, table);
 
 };
@@ -638,7 +638,7 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top, table) {
 
 
   var heightToAddTop = (this._pageStart) * this._sizeRowFirst;
-  console.log(heightToAddTop + ' ' + heightToAddBottom + ' ' + this._sizeRowsTotal);
+  // console.log(heightToAddTop + ' ' + heightToAddBottom + ' ' + this._sizeRowsTotal);
   // $('tbody tr:first').css('height', heightToAddTop);
   this._addHeights(heightToAddTop, heightToAddBottom);
   
@@ -665,52 +665,83 @@ DataTableView.prototype._intersection = function(table) {
 
   window.observer1 = new IntersectionObserver(function(entries) {
     self._downwardDirection = self._scrollTop < $('.data-table-container').scrollTop();
-    console.log(self._scrollTop);
+    // console.log(self._scrollTop);
     self._scrollTop = $('.data-table-container').scrollTop();
-    console.log(self._scrollTop + ' ' + self._downwardDirection);
+    // console.log(self._scrollTop + ' ' + self._downwardDirection);
     if(entries[0]['intersectionRatio'] > 0 && self._downwardDirection) {
-      console.log('Bottom element is fully visible in screen');
+      console.log('Loading upper set');
       self._onBottomTable(table);
       flag = true;
     }
-  }, { threshold: [0.1] });
+  }, { threshold: [0] });
+
   window.observer2 = new IntersectionObserver(function(entries) {
     self._downwardDirection = self._scrollTop <= $('.data-table-container').scrollTop();
-    console.log(self._scrollTop);
+    // console.log(self._scrollTop);
     self._scrollTop = $('.data-table-container').scrollTop();
-    console.log(self._scrollTop + ' ' + self._downwardDirection);
+    // console.log(self._scrollTop + ' ' + self._downwardDirection);
     if(entries[0]['intersectionRatio'] > 0 && !self._downwardDirection) {
-      console.log('Top element is fully visible in screen');
+      console.log('Loading next set');
       self._onTopTable(table);
       flag = true;
     }
-  }, { threshold: [0.1] });
+  }, { threshold: [0] });
+
   window.observer3 = new IntersectionObserver(function(entries) {
     // self._downwardDirection = self._scrollTop <= $('.data-table-container').scrollTop();
     // console.log(self._scrollTop);
+    console.log(entries[0].boundingClientRect.y);
+    // console.log(entries[0].boundingClientRect);
     self._scrollTop = $('.data-table-container').scrollTop();
     // console.log(self._scrollTop + ' ' + self._downwardDirection);
-    if(entries[0]['intersectionRatio'] > 0 && firstElement.offsetHeight > 0) {
-      console.log('First row is visible in screen');
-      var goto = self.getPageNumberSrcolling(self._scrollTop);
-      console.log(goto + ' ' + self._scrollTop);
-      self._onChangeGotoScrolling(self._scrollTop, goto, table);
-      flag = false;
-    }
-  }, { threshold: [0.00001] });
+    setTimeout(function() {
+      if(entries[0]['intersectionRatio'] > 0 && firstElement.offsetHeight > 0) {
+        console.log('First row is visible in screen');
+        var goto = self.getPageNumberSrcolling(self._scrollTop);
+        console.log(goto + ' ' + self._scrollTop);
+        self._onChangeGotoScrolling(self._scrollTop, goto, table);
+        flag = false;
+      }
+    }, 250);
+    // if(entries[0]['intersectionRatio'] > 0 && firstElement.offsetHeight > 0) {
+    //   console.log('First row is visible in screen');
+    //   var goto = self.getPageNumberSrcolling(self._scrollTop);
+    //   console.log(goto + ' ' + self._scrollTop);
+    //   self._onChangeGotoScrolling(self._scrollTop, goto, table);
+    //   flag = false;
+    // }
+  }, { threshold: [0] });
+
   window.observer4 = new IntersectionObserver(function(entries) {
     // self._downwardDirection = self._scrollTop <= $('.data-table-container').scrollTop();
     // console.log(self._scrollTop);
+    console.log(entries[0].boundingClientRect.y);
+    // console.log(entries[0].boundingClientRect);
     self._scrollTop = $('.data-table-container').scrollTop();
     // console.log(self._scrollTop + ' ' + self._downwardDirection);
-    if(entries[0]['intersectionRatio'] > 0) {
-      console.log('Last row is visible in screen');
-      var goto = self.getPageNumberSrcolling(self._scrollTop);
-      console.log(goto + ' ' + self._scrollTop);
-      self._onChangeGotoScrolling(self._scrollTop, goto, table);
-      flag = false;
-    }
-  }, { threshold: [0.00001] });
+    setTimeout(function() {
+      if(entries[0]['intersectionRatio'] > 0 && lastElement.offsetHeight > 0) {
+        console.log('Last row is visible in screen');
+        // if(entries[0].boundingClientRect.top < window.innerHeight && entries[0].boundingClientRect.top >= self._headerTop) {
+        //   console.log('Loading next set');
+        //   self._onTopTable(table);
+        // } else {
+          var goto = self.getPageNumberSrcolling(self._scrollTop);
+          console.log(goto + ' ' + self._scrollTop);
+          self._onChangeGotoScrolling(self._scrollTop, goto, table);
+          flag = false;
+        // }
+      }
+    }, 250);
+    // if(entries[0]['intersectionRatio'] > 0 && lastElement.offsetHeight > 0) {
+    //   console.log('Last row is visible in screen');
+    //   var goto = self.getPageNumberSrcolling(self._scrollTop);
+    //   console.log(goto + ' ' + self._scrollTop);
+    //   self._onChangeGotoScrolling(self._scrollTop, goto, table);
+    //   flag = false;
+    // }
+  }, { threshold: [0] });
+
   // setTimeout(function() {
   //   console.log("here");
   //   flag = false;
@@ -745,10 +776,9 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   // var heightToAddTop = this._pageStart * this._sizeRowFirst;
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (modifiedScrollPosition + this._sizeSinglePage));
   // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (heightToAddTop + this._sizeSinglePage));
-  console.log((heightToAddTop + heightToAddBottom) + ' ' + heightToAddTop + ' ' + heightToAddBottom
-  + ' ' + this._sizeRowsTotal);
+  // console.log((heightToAddTop + heightToAddBottom) + ' ' + heightToAddTop + ' ' + heightToAddBottom + ' ' + this._sizeRowsTotal);
 
-  $('tbody tr').slice(1, $('tbody tr').length - this._pageSize).remove();
+  $('tbody tr').slice(1, $('tbody tr').length - theProject.rowModel.rows.length).remove();
 
   // $('tbody tr:first').css('height', heightToAddTop);
   this._addHeights(heightToAddTop, heightToAddBottom);
@@ -781,7 +811,7 @@ DataTableView.prototype._showRowsBottom = function(scrollPosition, table, start,
   var self = this;
 
   this._totalSize = start + this._pageSize;
-  console.log(start);
+  // console.log(start);
   // $('tr.load-next-set').removeClass('load-next-set');
   observer1.unobserve(element);
 
