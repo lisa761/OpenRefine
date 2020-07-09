@@ -316,6 +316,7 @@ Refine.createUpdateFunction = function(options, onFinallyDone) {
     pushFunction(Refine.reinitializeProjectData);
   }
   if (options.everythingChanged || options.modelsChanged || options.rowsChanged || options.rowMetadataChanged || options.cellsChanged || options.engineChanged) {
+    console.log(options);
     pushFunction(function(onDone) {
       ui.dataTableView.update(onDone);
     });

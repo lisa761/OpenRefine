@@ -99,8 +99,10 @@ DataTableView.prototype.resize = function(table, elmt) {
 };
 
 DataTableView.prototype.update = function(onDone) {
+  console.log("update");
   this._currentPageNumber = 1;
-  this._showRows(0, onDone);
+  // this._showRows(0, onDone);
+  this._showRows(this._pageStart, onDone);
 };
 
 DataTableView.prototype.render = function() {
@@ -610,7 +612,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   document.querySelector('.data-table tbody').insertRow(0).setAttribute('class', 'first-row');
   this._headerTop = $('thead').offset().top + $('thead').height();
   // console.log(this._headerTop);
-  this._pageStart = 0;
+  // this._pageStart = 0;
   this._totalSize = this._pageSize;
   this._adjustNextSetClasses();
 
@@ -703,7 +705,10 @@ DataTableView.prototype._showRows = function(start, onDone) {
   // console.log('_showRows');
   var self = this;
   Refine.fetchRows(start, this._pageSize, function() {
-    self.render();
+    if(start) {
+      loadRows(this._pageStart);
+    }
+    else self.render();
     
     if (onDone) {
       onDone();
