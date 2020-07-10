@@ -191,8 +191,8 @@ BrowsingEngine.prototype.addFacet = function(type, config, options) {
   this._facets.push({ elmt: elmt, facet: facet });
 
   ui.leftPanelTabs.tabs({ active: 0 });
-  console.log("here is the change");
-  Refine.update({ engineChanged: true });
+  // console.log("here is the change");
+  Refine.update({ engineChanged: true }, null, true);
 };
 
 BrowsingEngine.prototype._createFacetContainer = function() {

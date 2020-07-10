@@ -300,7 +300,7 @@ Refine._renameProject = function() {
 
 Refine.customUpdateCallbacks = [];
 
-Refine.createUpdateFunction = function(options, onFinallyDone) {
+Refine.createUpdateFunction = function(options, onFinallyDone, fromFacets) {
   var functions = [];
   var pushFunction = function(f) {
     var index = functions.length;
@@ -318,7 +318,7 @@ Refine.createUpdateFunction = function(options, onFinallyDone) {
   if (options.everythingChanged || options.modelsChanged || options.rowsChanged || options.rowMetadataChanged || options.cellsChanged || options.engineChanged) {
     console.log(options);
     pushFunction(function(onDone) {
-      ui.dataTableView.update(onDone);
+      ui.dataTableView.update(onDone, fromFacets);
     });
     pushFunction(function(onDone) {
       ui.browsingEngine.update(onDone);
@@ -355,12 +355,12 @@ Refine.registerUpdateFunction = function(callback) {
    Refine.customUpdateCallbacks.push(callback);
 }
 
-Refine.update = function(options, onFinallyDone) {
+Refine.update = function(options, onFinallyDone, fromFacets) {
   var done = false;
   var dismissBusy = null;
 
   Refine.setAjaxInProgress();
-
+  // console.log("here:", onFinallyDone);
   Refine.createUpdateFunction(options, function() {
     Refine.clearAjaxInProgress();
 
@@ -371,7 +371,7 @@ Refine.update = function(options, onFinallyDone) {
     if (onFinallyDone) {
       onFinallyDone();
     }
-  })();
+  }, fromFacets)();
 
   window.setTimeout(function() {
     if (!done) {

@@ -98,11 +98,14 @@ DataTableView.prototype.resize = function(table, elmt) {
   tableContainer.height((tableContainerIntendedHeight - tableContainerVPadding) + "px");
 };
 
-DataTableView.prototype.update = function(onDone) {
+DataTableView.prototype.update = function(onDone, fromFacets) {
   console.log("update");
   this._currentPageNumber = 1;
-  // this._showRows(0, onDone);
-  this._showRows(this._pageStart, onDone);
+  if(!fromFacets) {
+    this._showRows(0, onDone);
+  } else {
+    this._showRows(this._pageStart, onDone);
+  }
 };
 
 DataTableView.prototype.render = function() {
@@ -612,7 +615,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   document.querySelector('.data-table tbody').insertRow(0).setAttribute('class', 'first-row');
   this._headerTop = $('thead').offset().top + $('thead').height();
   // console.log(this._headerTop);
-  // this._pageStart = 0;
+  this._pageStart = 0;
   this._totalSize = this._pageSize;
   this._adjustNextSetClasses();
 
@@ -684,7 +687,7 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (heightToAddTop + this._sizeSinglePage));
   // console.log((heightToAddTop + heightToAddBottom) + ' ' + heightToAddTop + ' ' + heightToAddBottom
   // + ' ' + this._sizeRowsTotal);
-  console.log($('.data-table tbody tr').length + ' ' + this._pageSize + ' ' + theProject.rowModel.rows.length);
+  // console.log($('.data-table tbody tr').length + ' ' + this._pageSize + ' ' + theProject.rowModel.rows.length);
   // $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - this._pageSize).remove();
   $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - theProject.rowModel.rows.length).remove();
 
