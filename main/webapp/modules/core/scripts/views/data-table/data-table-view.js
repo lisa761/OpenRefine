@@ -669,15 +669,15 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
   $('.data-table tbody tr:first').css('height', heightToAddTop);
 
     document.querySelector('.data-table').insertRow();
-    $('tr:last').css('height', heightToAddBottom);
-    $('tr:last').addClass('last-row');
+    $('.data-table tbody tr:last').css('height', heightToAddBottom);
+    $('.data-table tbody tr:last').addClass('last-row');
 
   if (theProject.rowModel.mode == "record-based") {
-    $('tr.record').eq(-1 * (this._pageSize / 2 + 1)).addClass('load-next-set');
-    $('tr.record').eq(this._pageSize / 2 + 1).addClass('load-next-set');
+    $('.data-table tbody tr.record').eq(-1 * (this._pageSize / 2 + 1)).addClass('load-next-set');
+    $('.data-table tbody tr.record').eq(this._pageSize / 2 + 1).addClass('load-next-set');
   } else {
-    $('tr').eq(-1 * (this._pageSize / 2 + 2)).addClass('load-next-set');
-    $('tr').eq(this._pageSize / 2 + 1).addClass('load-next-set');
+    $('.data-table tbody tr').eq(-1 * (this._pageSize / 2 + 2)).addClass('load-next-set');
+    $('.data-table tbody tr').eq(this._pageSize / 2).addClass('load-next-set');
   }
 }
 
@@ -695,6 +695,7 @@ DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosi
   $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - theProject.rowModel.rows.length).remove();
 
   // $('.data-table tbody tr:first').css('height', heightToAddTop);
+  // console.log(heightToAddTop, heightToAddBottom);
   this._addHeights(heightToAddTop, heightToAddBottom);
 
   console.log(this._pageStart + ' ' + this._totalSize);
@@ -712,7 +713,11 @@ DataTableView.prototype._showRows = function(start, onDone) {
   var self = this;
   Refine.fetchRows(start, this._pageSize, function() {
     if(start) {
-      loadRows(this._pageStart);
+      $('.last-row').remove();
+      loadRows(self._pageStart);
+      var modifiedScrollPosition = start * self._sizeRowFirst;
+      // console.log(start, self._pageStart, modifiedScrollPosition);
+      self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
     }
     else self.render();
     
@@ -772,7 +777,7 @@ DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scroll
   this._totalSize = start +  this._pageSize;
   // console.log(start);
   // console.log(this._totalSize);
-  $('tr.load-next-set').removeClass('load-next-set');
+  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
     // table.deleteRow(table.rows.length - 1);
