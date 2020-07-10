@@ -609,7 +609,10 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   // console.log(i);
   this._sizeRowFirst = total / this._pageSize;
   // console.log(this._sizeRowFirst + ' ' + min);
-  this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
+  this._sizeRowsTotal = this._sizeRowFirst * theProject.rowModel.filtered;
+  // this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
+  // theProject.metadata.rowCount was used for record made so that we can always keep track of total number of rows (no matter the number of records)
+  // console.log(theProject.metadata.rowCount + ' ' + theProject.rowModel.total + '\n' + theProject.rowModel.rows.length + ' ' + theProject.rowModel.filtered);
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
   // console.log(this._sizeSinglePage);
   document.querySelector('.data-table tbody').insertRow(0).setAttribute('class', 'first-row');
