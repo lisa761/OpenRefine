@@ -425,16 +425,20 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     // $(tr).empty();
     var cells = row.cells;
     var tdStar = tr.insertCell(tr.cells.length);
-    // $(tr.appendChild(document.createElement("th"))).attr('colspan', '3');
-    // var a = document.createElement('a');
-    // a.classList.add(row.starred ? "data-table-star-on" : "data-table-star-off");
-    // a.href = 'javascript:{}';
-    // tdStar.appendChild(a).appendChild(document.createTextNode('\u00A0'));
 
-    var star = $('<a href="javascript:{}">&nbsp;</a>')
-    .addClass(row.starred ? "data-table-star-on" : "data-table-star-off")
-    .appendTo(tdStar)
+    var a = document.createElement('a');
+    a.classList.add(row.starred ? "data-table-star-on" : "data-table-star-off");
+    a.href = 'javascript:{}';
+    tdStar.appendChild(a).appendChild(document.createTextNode('\u00A0'));
+
+    // var star = $('<a href="javascript:{}">&nbsp;</a>')
+    // .addClass(row.starred ? "data-table-star-on" : "data-table-star-off")
+    // .appendTo(tdStar)
+    // console.log($('<a href="javascript:{}">&nbsp;</a>').addClass(row.starred ? "data-table-star-on" : "data-table-star-off").appendTo(tdStar));
+    // var star = $('<a href="javascript:{}">&nbsp;</a>')
+    var star = $('a[href*="javascript:{}"]')
     .click(function() {
+    // tdStar.click(function() {
       var newStarred = !row.starred;
       Refine.postCoreProcess(
         "annotate-one-row",
