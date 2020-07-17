@@ -530,11 +530,17 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     // console.log(self._scrollTop + ' ' + $(this).scrollTop() + ' ' + self._downwardDirection);
     // console.log(self._downwardDirection);
 
-    var element = document.querySelectorAll('.load-next-set');
-    element = element[element.length - 1];
-    var position = element.getBoundingClientRect();
-    var element2 = document.querySelector('.load-next-set');
-    var position2 = element2.getBoundingClientRect();
+    try {
+      var element = document.querySelectorAll('.load-next-set');
+      element = element[element.length - 1];
+      var position = element.getBoundingClientRect();
+      var element2 = document.querySelector('.load-next-set');
+      var position2 = element2.getBoundingClientRect();
+    } catch (err) {
+      var position = {top: null, bottom: null};
+      var position2 = {top: null, bottom: null};
+      console.log(err);
+    }
     var lastElement = document.querySelector('.last-row');
     var positionLastElement = lastElement.getBoundingClientRect();
     var firstElement = document.querySelector('.first-row');
