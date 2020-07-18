@@ -422,23 +422,33 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   var renderRow = function(tr, r, row, even) {
     // console.log(JSON.stringify(tr) + ' ' + r + ' ' + JSON.stringify(row) + ' ' + even);
     console.log('renderRow');
-    // $(tr).empty();
+    $(tr).empty();
     var cells = row.cells;
     var tdStar = tr.insertCell(tr.cells.length);
-
-    // var a = document.createElement('a');
-    // a.classList.add(row.starred ? "data-table-star-on" : "data-table-star-off");
-    // a.href = 'javascript:{}';
-    // tdStar.appendChild(a).appendChild(document.createTextNode('\u00A0'));
-
-    var star = $('<a href="javascript:{}">&nbsp;</a>')
-    .addClass(row.starred ? "data-table-star-on" : "data-table-star-off")
-    .appendTo(tdStar)
-    // console.log($('<a href="javascript:{}">&nbsp;</a>').addClass(row.starred ? "data-table-star-on" : "data-table-star-off").appendTo(tdStar));
     // var star = $('<a href="javascript:{}">&nbsp;</a>')
-    // var star = $('a[href*="javascript:{}"]')
-    .click(function() {
-    // tdStar.click(function() {
+    // .addClass(row.starred ? "data-table-star-on" : "data-table-star-off")
+    // .appendTo(tdStar)
+    // .click(function() {
+    //   var newStarred = !row.starred;
+    //   Refine.postCoreProcess(
+    //     "annotate-one-row",
+    //     { row: row.i, starred: newStarred },
+    //     null,
+    //     {},
+    //     {
+    //       onDone: function(o) {
+    //         row.starred = newStarred;
+    //         renderRow(tr, r, row, even);
+    //       }
+    //     },
+    //     "json"
+    //   );
+    // });
+    var a = document.createElement('a');
+    a.className = row.starred ? "data-table-star-on" : "data-table-star-off";
+    a.href = 'javascript:{}';
+    tdStar.appendChild(a).appendChild(document.createTextNode('\u00A0'));
+    a.addEventListener('click', function() {
       var newStarred = !row.starred;
       Refine.postCoreProcess(
         "annotate-one-row",
@@ -456,10 +466,30 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     });
     
     var tdFlag = tr.insertCell(tr.cells.length);
-    var flag = $('<a href="javascript:{}">&nbsp;</a>')
-    .addClass(row.flagged ? "data-table-flag-on" : "data-table-flag-off")
-    .appendTo(tdFlag)
-    .click(function() {
+    // var flag = $('<a href="javascript:{}">&nbsp;</a>')
+    // .addClass(row.flagged ? "data-table-flag-on" : "data-table-flag-off")
+    // .appendTo(tdFlag)
+    // .click(function() {
+    //   var newFlagged = !row.flagged;
+    //   Refine.postCoreProcess(
+    //     "annotate-one-row",
+    //     { row: row.i, flagged: newFlagged },
+    //     null,
+    //     {},
+    //     {
+    //       onDone: function(o) {
+    //         row.flagged = newFlagged;
+    //         renderRow(tr, r, row, even);
+    //       }
+    //     },
+    //     "json"
+    //   );
+    // });
+    var flag = document.createElement('a');
+    flag.className = row.flagged ? "data-table-flag-on" : "data-table-flag-off";
+    flag.href = 'javascript:{}';
+    tdFlag.appendChild(flag).appendChild(document.createTextNode('\u00A0'));
+    flag.addEventListener('click', function() {
       var newFlagged = !row.flagged;
       Refine.postCoreProcess(
         "annotate-one-row",
