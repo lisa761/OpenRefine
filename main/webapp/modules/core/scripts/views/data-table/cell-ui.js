@@ -61,20 +61,34 @@ DataTableCellUI.previewMatchedCells = true;
 DataTableCellUI.prototype._render = function() {
   var self = this;
   var cell = this._cell;
+  // console.log("here");
+  // console.log(this._td);
 
-  var divContent = $('<div/>')
-  .addClass("data-table-cell-content");
+  // var divContent = $('<div/>')
+  // .addClass("data-table-cell-content");
+  var divContent = document.createElement('div');
+  divContent.className = 'data-table-cell-content';
 
-  var editLink = $('<a href="javascript:{}">&nbsp;</a>')
-  .addClass("data-table-cell-edit")
-  .attr("title", $.i18n('core-views/edit-cell'))
-  .appendTo(divContent)
-  .click(function() { self._startEdit(this); });
+  // var editLink = $('<a href="javascript:{}">&nbsp;</a>')
+  // .addClass("data-table-cell-edit")
+  // .attr("title", $.i18n('core-views/edit-cell'))
+  // .appendTo(divContent)
+  // .click(function() { self._startEdit(this); });
+  var editLink = document.createElement('a');
+  editLink.className = 'data-table-cell-edit';
+  editLink.setAttribute('title', $.i18n('core-views/edit-cell'));
+  editLink.href = 'javascript:{}';
+  divContent.appendChild(editLink).appendChild(document.createTextNode('\u00A0'));
+  editLink.addEventListener('click', function() { self._startEdit(this); });
 
+  // $(this._td).empty()
+  // .unbind()
+  // .mouseenter(function() { editLink.css("visibility", "visible"); })
+  // .mouseleave(function() { editLink.css("visibility", "hidden"); });
   $(this._td).empty()
   .unbind()
-  .mouseenter(function() { editLink.css("visibility", "visible"); })
-  .mouseleave(function() { editLink.css("visibility", "hidden"); });
+  .mouseenter(function() { editLink.style.visibility = "visible" })
+  .mouseleave(function() { editLink.style.visibility = "hidden" });
 
   if (!cell || ("v" in cell && cell.v === null)) {
     $('<span>').addClass("data-table-null").html('null').appendTo(divContent);
@@ -233,7 +247,8 @@ DataTableCellUI.prototype._render = function() {
     }
   }
 
-  divContent.appendTo(this._td);
+  // divContent.appendTo(this._td);
+  this._td.appendChild(divContent);
 };
 
 DataTableCellUI.prototype._doRematch = function() {
