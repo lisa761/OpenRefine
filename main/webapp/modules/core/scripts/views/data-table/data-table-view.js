@@ -510,13 +510,22 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     if (theProject.rowModel.mode == "record-based") {
       if ("j" in row) {
         $(tr).addClass("record");
-        $('<div></div>').html((row.j + 1) + ".").appendTo(tdIndex);
+        // $('<div></div>').html((row.j + 1) + ".").appendTo(tdIndex);
+        var div = document.createElement('div');
+        div.innerHTML = (row.j + 1) + '.';
+        tdIndex.appendChild(div);
       } else {
-        $('<div></div>').html("&nbsp;").appendTo(tdIndex);
+        // $('<div></div>').html("&nbsp;").appendTo(tdIndex);
+        var div = document.createElement('div');
+        div.innerHTML = '\u00A0';
+        tdIndex.appendChild(div);
       }
       // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     } else {
-      $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
+      // $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
+      var div = document.createElement('div');
+      div.innerHTML = (row.i + 1) + '.';
+      tdIndex.appendChild(div);
       // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     }
 
