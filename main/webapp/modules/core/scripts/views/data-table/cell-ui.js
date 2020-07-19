@@ -91,28 +91,48 @@ DataTableCellUI.prototype._render = function() {
   .mouseleave(function() { editLink.style.visibility = "hidden" });
 
   if (!cell || ("v" in cell && cell.v === null)) {
-    $('<span>').addClass("data-table-null").html('null').appendTo(divContent);
+    // $('<span>').addClass("data-table-null").html('null').appendTo(divContent);
+    var span = document.createElement('span');
+    span.className = 'data-table-null';
+    span.innerHTML = 'null';
+    divContent.appendChild(span);
   } else if ("e" in cell) {
-    $('<span>').addClass("data-table-error").text(cell.e).appendTo(divContent);
+    // $('<span>').addClass("data-table-error").text(cell.e).appendTo(divContent);
+    var span = document.createElement('span');
+    span.className = 'data-table-error';
+    span.innerHTML = cell.e;
+    divContent.appendChild(span);
   } else if (!("r" in cell) || !cell.r) {
     if (typeof cell.v !== "string" || "t" in cell) {
       if (typeof cell.v == "number") {
         divContent.addClass("data-table-cell-content-numeric");
       }
-      $('<span>')
-      .addClass("data-table-value-nonstring")
-      .text(cell.v)
-      .appendTo(divContent);
+      // $('<span>')
+      // .addClass("data-table-value-nonstring")
+      // .text(cell.v)
+      // .appendTo(divContent);
+      var span = document.createElement('span');
+      span.className = 'data-table-value-nonstring';
+      span.innerHTML = cell.v;
+      divContent.appendChild(span);
     } else if (URL.looksLikeUrl(cell.v)) {
-      $('<a>')
-      .text(cell.v)
-      .attr("href", cell.v)
-      .attr("target", "_blank")
-      .appendTo(divContent);
+      // $('<a>')
+      // .text(cell.v)
+      // .attr("href", cell.v)
+      // .attr("target", "_blank")
+      // .appendTo(divContent);
+      var a = document.createElement('a');
+      a.innerHTML = cell.v;
+      a.setAttribute('href', cell.v);
+      a.setAttribute('target', '_blank');
+      divContent.appendChild(a);
     } else {
-      $('<span>')
-      .text(cell.v)
-      .appendTo(divContent);
+      // $('<span>')
+      // .text(cell.v)
+      // .appendTo(divContent);
+      var span = document.createElement('span');
+      span.innerHTML = cell.v;
+      divContent.appendChild(span);
     }
   } else {
     var r = cell.r;
