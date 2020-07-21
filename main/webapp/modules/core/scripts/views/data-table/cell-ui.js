@@ -100,7 +100,7 @@ DataTableCellUI.prototype._render = function() {
     // $('<span>').addClass("data-table-error").text(cell.e).appendTo(divContent);
     var span = document.createElement('span');
     span.className = 'data-table-error';
-    span.innerHTML = cell.e;
+    span.textContent = cell.e;
     divContent.appendChild(span);
   } else if (!("r" in cell) || !cell.r) {
     if (typeof cell.v !== "string" || "t" in cell) {
@@ -113,7 +113,7 @@ DataTableCellUI.prototype._render = function() {
       // .appendTo(divContent);
       var span = document.createElement('span');
       span.className = 'data-table-value-nonstring';
-      span.innerHTML = cell.v;
+      span.textContent = cell.v;
       divContent.appendChild(span);
     } else if (URL.looksLikeUrl(cell.v)) {
       // $('<a>')
@@ -122,7 +122,7 @@ DataTableCellUI.prototype._render = function() {
       // .attr("target", "_blank")
       // .appendTo(divContent);
       var a = document.createElement('a');
-      a.innerHTML = cell.v;
+      a.textContent = cell.v;
       a.setAttribute('href', cell.v);
       a.setAttribute('target', '_blank');
       divContent.appendChild(a);
@@ -131,7 +131,7 @@ DataTableCellUI.prototype._render = function() {
       // .text(cell.v)
       // .appendTo(divContent);
       var span = document.createElement('span');
-      span.innerHTML = cell.v;
+      span.textContent = cell.v;
       divContent.appendChild(span);
     }
   } else {
