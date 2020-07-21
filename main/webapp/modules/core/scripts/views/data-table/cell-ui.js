@@ -62,18 +62,10 @@ DataTableCellUI.prototype._render = function() {
   var self = this;
   var cell = this._cell;
   // console.log("here");
-  // console.log(this._td);
 
-  // var divContent = $('<div/>')
-  // .addClass("data-table-cell-content");
   var divContent = document.createElement('div');
   divContent.className = 'data-table-cell-content';
 
-  // var editLink = $('<a href="javascript:{}">&nbsp;</a>')
-  // .addClass("data-table-cell-edit")
-  // .attr("title", $.i18n('core-views/edit-cell'))
-  // .appendTo(divContent)
-  // .click(function() { self._startEdit(this); });
   var editLink = document.createElement('a');
   editLink.className = 'data-table-cell-edit';
   editLink.setAttribute('title', $.i18n('core-views/edit-cell'));
@@ -81,23 +73,17 @@ DataTableCellUI.prototype._render = function() {
   divContent.appendChild(editLink).appendChild(document.createTextNode('\u00A0'));
   editLink.addEventListener('click', function() { self._startEdit(this); });
 
-  // $(this._td).empty()
-  // .unbind()
-  // .mouseenter(function() { editLink.css("visibility", "visible"); })
-  // .mouseleave(function() { editLink.css("visibility", "hidden"); });
   $(this._td).empty()
   .unbind()
   .mouseenter(function() { editLink.style.visibility = "visible" })
   .mouseleave(function() { editLink.style.visibility = "hidden" });
 
   if (!cell || ("v" in cell && cell.v === null)) {
-    // $('<span>').addClass("data-table-null").html('null').appendTo(divContent);
     var span = document.createElement('span');
     span.className = 'data-table-null';
     span.innerHTML = 'null';
     divContent.appendChild(span);
   } else if ("e" in cell) {
-    // $('<span>').addClass("data-table-error").text(cell.e).appendTo(divContent);
     var span = document.createElement('span');
     span.className = 'data-table-error';
     span.textContent = cell.e;
@@ -107,29 +93,17 @@ DataTableCellUI.prototype._render = function() {
       if (typeof cell.v == "number") {
         divContent.addClass("data-table-cell-content-numeric");
       }
-      // $('<span>')
-      // .addClass("data-table-value-nonstring")
-      // .text(cell.v)
-      // .appendTo(divContent);
       var span = document.createElement('span');
       span.className = 'data-table-value-nonstring';
       span.textContent = cell.v;
       divContent.appendChild(span);
     } else if (URL.looksLikeUrl(cell.v)) {
-      // $('<a>')
-      // .text(cell.v)
-      // .attr("href", cell.v)
-      // .attr("target", "_blank")
-      // .appendTo(divContent);
       var a = document.createElement('a');
       a.textContent = cell.v;
       a.setAttribute('href', cell.v);
       a.setAttribute('target', '_blank');
       divContent.appendChild(a);
     } else {
-      // $('<span>')
-      // .text(cell.v)
-      // .appendTo(divContent);
       var span = document.createElement('span');
       span.textContent = cell.v;
       divContent.appendChild(span);
