@@ -715,11 +715,11 @@ DataTableView.prototype._showRows = function(start, onDone) {
   var self = this;
   Refine.fetchRows(start, this._pageSize, function() {
     if(start) {
-      $('.last-row').remove();
-      loadRows(self._pageStart);
-      var modifiedScrollPosition = start * self._sizeRowFirst;
-      // console.log(start, self._pageStart, modifiedScrollPosition);
-      self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
+      // $('.last-row').remove();
+      // loadRows(self._pageStart);
+      // var modifiedScrollPosition = start * self._sizeRowFirst;
+      // // console.log(start, self._pageStart, modifiedScrollPosition);
+      // self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
     }
     else self.render();
     
