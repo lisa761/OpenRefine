@@ -646,7 +646,7 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   // if($('.data-table tbody tr').length > 102 && start > 100 && top == null) {
   if($('.data-table tbody tr').length > this._pageSize + 2 && start > this._pageSize && top == null) {
     console.log('Deleting above rows');
-    $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - 2 * this._pageSize).remove();
+    $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
     this._pageStart = start - this._pageSize;
     // console.log($('.data-table tbody tr').length - this._pageSize);
   }
@@ -682,13 +682,6 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
       $('.data-table tbody tr').eq(this._pageSize / 2).addClass('load-next-set');
     }
   }
-  // if (theProject.rowModel.mode == "record-based") {
-  //   $('.data-table tbody tr.record').eq(-1 * (this._pageSize / 2 + 1)).addClass('load-next-set');
-  //   $('.data-table tbody tr.record').eq(this._pageSize / 2 + 1).addClass('load-next-set');
-  // } else {
-  //   $('.data-table tbody tr').eq(-1 * (this._pageSize / 2 + 2)).addClass('load-next-set');
-  //   $('.data-table tbody tr').eq(this._pageSize / 2).addClass('load-next-set');
-  // }
 }
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
@@ -866,10 +859,10 @@ DataTableView.prototype._onClickNextPage = function(elmt, evt) {
 DataTableView.prototype._onBottomTable = function(scrollPosition, table, elmt, evt) {
   // console.log('_onBottomTable');
   // console.log(this._totalSize + this._pageSize);
-  // if(this._totalSize < theProject.rowModel.total) {
+  if(this._totalSize < theProject.rowModel.filtered) {
     // this._showRowsBottom(scrollPosition, table, theProject.rowModel.start + this._pageSize);
     this._showRowsBottom(scrollPosition, table, this._totalSize);
-  // }
+  }
 };
 
 DataTableView.prototype._onTopTable = function(scrollPosition, table, elmt, evt) {
