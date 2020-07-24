@@ -475,14 +475,11 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       } else {
         $('<div></div>').html("&nbsp;").appendTo(tdIndex);
       }
-      // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     } else {
       $('<div></div>').html((row.i + 1) + ".").appendTo(tdIndex);
-      // console.log("\n" + tr.innerHTML + "\n\n" + JSON.stringify(row) + "\n\n");
     }
 
     $(tr).addClass(even ? "even" : "odd");
-    // $(tr).css('height', '30px');
 
     for (var i = 0; i < columns.length; i++) {
       var column = columns[i];
@@ -498,38 +495,27 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
   window.loadRows = function(start) {
     var rows = theProject.rowModel.rows;
-    // console.log(JSON.stringify(rows));
     var even = true;
     for (var r = 0; r < rows.length; r++) {
       var row = rows[r];
       var tr;
       if(start != null) {
-        // console.log(start + r);
         tr = table.insertRow(r + 1);
-        // console.log(r + 2);
       }
       else {
         tr = table.insertRow(table.rows.length);
       }
-      // console.log(tr);
       if (theProject.rowModel.mode == "row-based" || "j" in row) {
         even = !even;
       }
       renderRow(tr, r, row, even);
-      // start++;
     }
   }
   loadRows();
 
   var flag = 0;
   $(table.parentNode.parentNode).bind('scroll', function(evt) {
-
-    // console.log($(this).scrollTop());
-    // console.log(self._scrollTop >= $(this).scrollTop());
     self._downwardDirection = self._scrollTop < $(this).scrollTop();
-    // console.log(self._scrollTop + ' ' + $(this).scrollTop() + ' ' + self._downwardDirection);
-    // console.log(self._downwardDirection);
-
     try {
       var element = document.querySelectorAll('.load-next-set');
       element = element[element.length - 1];
@@ -547,7 +533,6 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     var positionFirstElement = firstElement.getBoundingClientRect();
 
     if(self._downwardDirection && !flag) {
-      // console.log('Here');
       if((position.top >= 0 && position.bottom <= window.innerHeight) || 
         (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
         console.log('Loading next set');
@@ -555,10 +540,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         self._onBottomTable(self._scrollTop, table, this, evt);
       }
     }
-
-    // console.log(self._downwardDirection + ' ' + flag);
     if(!self._downwardDirection && !flag) {
-      // console.log('Here');
       if(position2.top >= 0 && position2.bottom <= window.innerHeight || 
         (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
         console.log('Loading upper set');
@@ -566,17 +548,13 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         self._onTopTable(self._scrollTop, table, this, evt);
       }
     }
-    // console.log(positionLastElement.top + ' ' + positionLastElement.bottom + ' \n ' + positionFirstElement.top + ' ' + positionFirstElement.bottom);
     clearTimeout($.data(this, 'scrollTimer'));
     $.data(this, 'scrollTimer', setTimeout(function() {
-      // self._downwardDirection = self._scrollTop < $(this).scrollTop();
-    // console.log(positionFirstElement.top + ' ' + positionFirstElement.bottom + ' thead: ' + self._headerTop);
       if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
         console.log('Last row is partially visible in screen');
         var goto = self.getPageNumberSrcolling(self._scrollTop);
         console.log(goto + ' ' + self._scrollTop);
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
-        // setScroll(self._scrollTop);
       }
       
       if(positionFirstElement.top < self._headerTop + 1 && 
@@ -585,7 +563,6 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         var goto = self.getPageNumberSrcolling(self._scrollTop);
         console.log(goto + ' ' + self._scrollTop);
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
-        // setScroll(self._scrollTop);
       }
       flag = 0;
 
@@ -593,9 +570,6 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     self._scrollTop = $(this).scrollTop();
   });
 
-  // this._sizeRowFirst = $('tr:eq(1)').height();
-  // this._sizeRowFirst = 31;
-  // var table = document.querySelector("table");
   var total = 0;
   var min = Infinity;
   for (var i = 1; i < table.rows.length; i++) {
@@ -603,22 +577,16 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       total += row.offsetHeight;
       if(row.offsetHeight < min) {
         min = row.offsetHeight;
-        // console.log(row);
       }
-      // console.log(row);
   }
-  // console.log(i);
   this._sizeRowFirst = total / this._pageSize;
-  // console.log(this._sizeRowFirst + ' ' + min);
+  console.log(table.rows.length, this._sizeRowFirst, min);
   this._sizeRowsTotal = this._sizeRowFirst * theProject.rowModel.filtered;
-  // this._sizeRowsTotal = this._sizeRowFirst * theProject.metadata.rowCount;
   // theProject.metadata.rowCount was used for record made so that we can always keep track of total number of rows (no matter the number of records)
-  // console.log(theProject.metadata.rowCount + ' ' + theProject.rowModel.total + '\n' + theProject.rowModel.rows.length + ' ' + theProject.rowModel.filtered);
+  console.log(theProject.metadata.rowCount + ' ' + theProject.rowModel.total + '\n' + theProject.rowModel.rows.length + ' ' + theProject.rowModel.filtered);
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
-  // console.log(this._sizeSinglePage);
   document.querySelector('.data-table tbody').insertRow(0).setAttribute('class', 'first-row');
   this._headerTop = $('thead').offset().top + $('thead').height();
-  // console.log(this._headerTop);
   this._pageStart = 0;
   this._totalSize = this._pageSize;
   this._adjustNextSetClasses();
@@ -627,9 +595,6 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
 DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition) {
   var num = Math.floor(scrollPosition / this._sizeSinglePage);
-  // var num = Math.floor(theProject.metadata.rowCount / this._totalSize);
-  // var num = Math.floor(this._totalSize / this._pageSize);
-  // console.log(num);
   return num;
 }
 
@@ -639,28 +604,20 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._totalSize) * this._sizeRowFirst);
   if(top) {
     this._pageStart = start;
-    // heightToAddBottom = Math.max(0, this._sizeRowsTotal - (this._pageStart + 2 * this._pageSize) * this._sizeRowFirst);
-    // heightToAddTop = (start/* - this._pageSize*/) * this._sizeRowFirst;
   }
 
-  // if($('.data-table tbody tr').length > 102 && start > 100 && top == null) {
   if($('.data-table tbody tr').length > this._pageSize + 2 && start > this._pageSize && top == null) {
     console.log('Deleting above rows');
     $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
     this._pageStart = start - this._pageSize;
-    // console.log($('.data-table tbody tr').length - this._pageSize);
   }
-  // if($('.data-table tbody tr').length > 201 && top) {
   if($('.data-table tbody tr').length > 2 * this._pageSize + 1 && top) {
     console.log('Deleting below rows');
-    // $('.data-table tbody tr').slice(201, $('.data-table tbody tr').length).remove();
     $('.data-table tbody tr').slice(2 * this._pageSize + 1, $('.data-table tbody tr').length).remove();
   }
 
 
   var heightToAddTop = (this._pageStart) * this._sizeRowFirst;
-  // console.log(heightToAddTop + ' ' + heightToAddBottom + ' ' + this._sizeRowsTotal);
-  // $('.data-table tbody tr:first').css('height', heightToAddTop);
   this._addHeights(heightToAddTop, heightToAddBottom);
   
   console.log(this._pageStart + ' ' + this._totalSize);
@@ -672,7 +629,6 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
   document.querySelector('.data-table').insertRow();
   $('.data-table tbody tr:last').css('height', heightToAddBottom);
   $('.data-table tbody tr:last').addClass('last-row');
-  // console.log(theProject.rowModel.rows.length, theProject.rowModel.filtered);
   if(theProject.rowModel.rows.length >= this._pageSize) {
     if (theProject.rowModel.mode == "record-based") {
       $('.data-table tbody tr.record').eq(-1 * (this._pageSize / 2 + 1)).addClass('load-next-set');
@@ -682,48 +638,33 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
       $('.data-table tbody tr').eq(this._pageSize / 2).addClass('load-next-set');
     }
   }
+  console.log(heightToAddTop, heightToAddBottom, this._sizeRowsTotal, this._sizeSinglePage);
 }
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
   console.log('adjustNextSetClassesSpeed');
-  // this._pageStart = start;
   var heightToAddTop = modifiedScrollPosition;
-  // var heightToAddTop = this._pageStart * this._sizeRowFirst;
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (modifiedScrollPosition + this._sizeSinglePage));
-  // var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (heightToAddTop + this._sizeSinglePage));
-  // console.log((heightToAddTop + heightToAddBottom) + ' ' + heightToAddTop + ' ' + heightToAddBottom
-  // + ' ' + this._sizeRowsTotal);
-  // console.log($('.data-table tbody tr').length + ' ' + this._pageSize + ' ' + theProject.rowModel.rows.length);
-  // $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - this._pageSize).remove();
   $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - theProject.rowModel.rows.length).remove();
   this._pageStart = this._totalSize - this._pageSize;
 
-  // $('.data-table tbody tr:first').css('height', heightToAddTop);
-  // console.log(heightToAddTop, heightToAddBottom);
   this._addHeights(heightToAddTop, heightToAddBottom);
 
   console.log(this._pageStart + ' ' + this._totalSize);
 };
 
-// var setScroll = function(scrollPosition) {
-//     console.log("setScroll");
-//     // console.log(scrollPosition);
-//     $('.data-table-container').scrollTop(scrollPosition);
-//     // console.log($('.data-table-container').scrollTop());
-// };
-
 DataTableView.prototype._showRows = function(start, onDone) {
-  // console.log('_showRows');
+  console.log('_showRows');
   var self = this;
   Refine.fetchRows(start, this._pageSize, function() {
-    if(start) {
+    /*if(start) {
       $('.last-row').remove();
       loadRows(self._pageStart);
       var modifiedScrollPosition = start * self._sizeRowFirst;
       // console.log(start, self._pageStart, modifiedScrollPosition);
       self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
     }
-    else self.render();
+    else*/ self.render();
     
     if (onDone) {
       onDone();
@@ -736,11 +677,8 @@ DataTableView.prototype._showRowsBottom = function(scrollPosition, table, start,
   var self = this;
 
   this._totalSize = start + this._pageSize;
-  // console.log(start);
-  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
-    // table.deleteRow(table.rows.length - 1);
     $('.last-row').remove();
 
     loadRows();
@@ -757,12 +695,8 @@ DataTableView.prototype._showRowsTop = function(scrollPosition, table, start, on
   var self = this;
 
   this._totalSize = start + 2 * this._pageSize;
-  // console.log(start);
-  // var starting = start;
-  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
-    // table.deleteRow(table.rows.length - 1);
     $('.last-row').remove();
 
     loadRows(start);
@@ -779,17 +713,12 @@ DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scroll
   var self = this;
 
   this._totalSize = start +  this._pageSize;
-  // console.log(start);
-  // console.log(this._totalSize);
-  // $('tr.load-next-set').removeClass('load-next-set');
 
   Refine.fetchRows(start, this._pageSize, function() {
-    // table.deleteRow(table.rows.length - 1);
     $('.last-row').remove();
 
     loadRows();
     self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
-    // setScroll(scrollPosition);
     
     if (onDone) {
       onDone();
@@ -801,13 +730,8 @@ DataTableView.prototype._onChangeGotoScrolling = function(scrollPosition, gotoPa
   console.log("_onChangeGotoScrolling");
   
   this._currentPageNumber = gotoPageNumber;
-  // console.log((gotoPageNumber - 1) * this._pageSize);
-  // this._showRowsSpeed(scrollPosition, table, (gotoPageNumber - 1) * this._pageSize);
-  var modifiedScrollPosition = this._sizeRowFirst * (gotoPageNumber/* - 1*/) * this._pageSize;
-  // console.log(modifiedScrollPosition + ' ' + scrollPosition);
-  // if(this._totalSize < theProject.rowModel.total) {
-    this._showRowsSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber/* - 1*/) * this._pageSize);
-  // }
+  var modifiedScrollPosition = this._sizeRowFirst * (gotoPageNumber) * this._pageSize;
+  this._showRowsSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber) * this._pageSize);
 };
 
 DataTableView.prototype._onChangeGotoPage = function(elmt, evt) {
@@ -857,19 +781,13 @@ DataTableView.prototype._onClickNextPage = function(elmt, evt) {
 };
 
 DataTableView.prototype._onBottomTable = function(scrollPosition, table, elmt, evt) {
-  // console.log('_onBottomTable');
-  // console.log(this._totalSize + this._pageSize);
   if(this._totalSize < theProject.rowModel.filtered) {
-    // this._showRowsBottom(scrollPosition, table, theProject.rowModel.start + this._pageSize);
     this._showRowsBottom(scrollPosition, table, this._totalSize);
   }
 };
 
 DataTableView.prototype._onTopTable = function(scrollPosition, table, elmt, evt) {
-  // console.log('_onTopTable');
-  // console.log(theProject.rowModel.start + ' ' + (theProject.rowModel.start - 2 * this._pageSize));
   if(this._pageStart - this._pageSize >= 0) {
-    // this._showRowsTop(scrollPosition, table, theProject.rowModel.start - 2 * this._pageSize);
     this._showRowsTop(scrollPosition, table, this._pageStart - this._pageSize);
   }
 };
