@@ -606,14 +606,29 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
     this._pageStart = start;
   }
 
-  if($('.data-table tbody tr').length > this._pageSize + 2 && start > this._pageSize && top == null) {
-    console.log('Deleting above rows');
-    $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
+  if(!top) {
+    // console.log('Deleting above rows');
+    if (theProject.rowModel.mode == "record-based") {
+      if($('.data-table tbody tr.record').length > 2 * this._pageSize) {
+        console.log('Deleting above records');
+        // $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - $('.data-table tbody tr.record').eq(2 * this._pageSize).index())).remove();
+        $('.data-table tbody tr').slice(1, $('.data-table tbody tr.record').eq(this._pageSize).index()).remove();
+      }
+    } else if($('.data-table tbody tr').length > 2 * this._pageSize) {
+      console.log('Deleting above rows');
+      $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
+    }
     this._pageStart = start - this._pageSize;
   }
-  if($('.data-table tbody tr').length > 2 * this._pageSize + 1 && top) {
-    console.log('Deleting below rows');
-    $('.data-table tbody tr').slice(2 * this._pageSize + 1, $('.data-table tbody tr').length).remove();
+  if(top) {
+    // console.log('Deleting below rows');
+    if (theProject.rowModel.mode == "record-based") {
+      console.log('Deleting below records');
+      $('.data-table tbody tr').slice($('.data-table tbody tr.record').eq(2 * this._pageSize).index(), $('.data-table tbody tr').length).remove();
+    } else {
+      console.log('Deleting below rows');
+      $('.data-table tbody tr').slice(2 * this._pageSize + 1, $('.data-table tbody tr').length).remove();
+    }
   }
 
 
@@ -632,7 +647,7 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
   if(theProject.rowModel.rows.length >= this._pageSize) {
     if (theProject.rowModel.mode == "record-based") {
       $('.data-table tbody tr.record').eq(-1 * (this._pageSize / 2 + 1)).addClass('load-next-set');
-      $('.data-table tbody tr.record').eq(this._pageSize / 2 + 1).addClass('load-next-set');
+      $('.data-table tbody tr.record').eq(this._pageSize / 2 - 1).addClass('load-next-set');
     } else {
       $('.data-table tbody tr').eq(-1 * (this._pageSize / 2 + 2)).addClass('load-next-set');
       $('.data-table tbody tr').eq(this._pageSize / 2).addClass('load-next-set');
