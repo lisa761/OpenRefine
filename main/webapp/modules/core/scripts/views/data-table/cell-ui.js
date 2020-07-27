@@ -90,7 +90,7 @@ DataTableCellUI.prototype._render = function() {
   } else if (!("r" in cell) || !cell.r) {
     if (typeof cell.v !== "string" || "t" in cell) {
       if (typeof cell.v == "number") {
-        divContent.addClass("data-table-cell-content-numeric");
+        divContent.classList.add("data-table-cell-content-numeric");
       }
       var nonstringSpan = document.createElement('span');
       nonstringSpan.className = 'data-table-value-nonstring';
@@ -112,71 +112,135 @@ DataTableCellUI.prototype._render = function() {
     var service = (r.service) ? ReconciliationManager.getServiceFromUrl(r.service) : null;
 
     if (r.j == "new") {
-      $('<span>').text(cell.v).appendTo(divContent);
-      $('<span>').addClass("data-table-recon-new").text("new").appendTo(divContent);
+      // $('<span>').text(cell.v).appendTo(divContent);
+      // $('<span>').addClass("data-table-recon-new").text("new").appendTo(divContent);
+      var span1 = document.createElement('span');
+      span1.textContent = cell.v;
+      divContent.appendChild(span1);
+      var span2 = document.createElement('span');
+      span2.className = 'data-table-recon-new';
+      span2.textContent = 'new';
+      divContent.appendChild(span2);
 
-      $('<a href="javascript:{}"></a>')
-      .text($.i18n('core-views/choose-match'))
-      .addClass("data-table-recon-action")
-      .appendTo(divContent).click(function(evt) {
+      // $('<a href="javascript:{}"></a>')
+      // .text($.i18n('core-views/choose-match'))
+      // .addClass("data-table-recon-action")
+      // .appendTo(divContent).click(function(evt) {
+      //   self._doRematch();
+      // });
+      var chooseMatch = document.createElement('a');
+      chooseMatch.herf = 'javascript:{}';
+      chooseMatch.textContent = 'core-views/choose-match';
+      chooseMatch.className = 'data-table-recon-action';
+      divContent.appendChild(chooseMatch);
+      chooseMatch.addEventListener('click', function(evt) {
         self._doRematch();
       });
     } else if (r.j == "matched" && "m" in r && r.m !== null) {
       var match = cell.r.m;
-      var a = $('<a></a>')
-      .text(match.name)
-      .attr("target", "_blank")
-      .appendTo(divContent);
+      // var a = $('<a></a>')
+      // .text(match.name)
+      // .attr("target", "_blank")
+      // .appendTo(divContent);
+      var a = document.createElement('a');
+      a.textContent = match.name;
+      a.setAttribute('target', '_blank');
+      divContent.appendChild(a);
 
       if (service && (service.view) && (service.view.url)) {
-        a.attr("href", encodeURI(service.view.url.replace("{{id}}", match.id)));
+        // a.attr("href", encodeURI(service.view.url.replace("{{id}}", match.id)));
+        a.href = encodeURI(service.view.url.replace("{{id}}", match.id));
       }
 
       if (DataTableCellUI.previewMatchedCells) {
         self._previewOnHover(service, match, a, a, false);
       }
 
-      $('<span> </span>').appendTo(divContent);
-      $('<a href="javascript:{}"></a>')
-      .text($.i18n('core-views/choose-match'))
-      .addClass("data-table-recon-action")
-      .appendTo(divContent)
-      .click(function(evt) {
+      // $('<span> </span>').appendTo(divContent);
+      var span = document.createElement('span');
+      span.textContent = ' ';
+      divContent.appendChild(span);
+      // $('<a href="javascript:{}"></a>')
+      // .text($.i18n('core-views/choose-match'))
+      // .addClass("data-table-recon-action")
+      // .appendTo(divContent)
+      // .click(function(evt) {
+      //   self._doRematch();
+      // });
+      var chooseMatch = document.createElement('a');
+      chooseMatch.herf = 'javascript:{}';
+      chooseMatch.textContent = 'core-views/choose-match';
+      chooseMatch.className = 'data-table-recon-action';
+      divContent.appendChild(chooseMatch);
+      chooseMatch.addEventListener('click', function(evt) {
         self._doRematch();
       });
     } else {
-      $('<span>').text(cell.v).appendTo(divContent);
+      // $('<span>').text(cell.v).appendTo(divContent);
+      var span = document.createElement('span');
+      span.textContent = cell.v;
+      divContent.appendChild(span);
 
       if (this._dataTableView._showRecon) {
-        var ul = $('<div></div>').addClass("data-table-recon-candidates").appendTo(divContent);
+        // var ul = $('<div></div>').addClass("data-table-recon-candidates").appendTo(divContent);
+        var ul = document.createElement('div');
+        ul.className = 'data-table-recon-candidates';
+        divContent.appendChild(ul);
         if ("c" in r && r.c.length > 0) {
           var candidates = r.c;
           var renderCandidate = function(candidate, index) {
-            var li = $('<div></div>').addClass("data-table-recon-candidate").appendTo(ul);
-            var liSpan = $('<span></span>').appendTo(li);
+            // var li = $('<div></div>').addClass("data-table-recon-candidate").appendTo(ul);
+            var li = document.createElement('div');
+            li.className = 'data-table-recon-candidate';
+            ul.appendChild(li);
+            // var liSpan = $('<span></span>').appendTo(li);
+            var liSpan = document.createElement('span');
+            li.appendChild(liSpan);
 
-            $('<a href="javascript:{}">&nbsp;</a>')
-            .addClass("data-table-recon-match-similar")
-            .attr("title", $.i18n('core-views/match-all-cells'))
-            .appendTo(liSpan).click(function(evt) {
+            // $('<a href="javascript:{}">&nbsp;</a>')
+            // .addClass("data-table-recon-match-similar")
+            // .attr("title", $.i18n('core-views/match-all-cells'))
+            // .appendTo(liSpan).click(function(evt) {
+            //   self._doMatchTopicToSimilarCells(candidate);
+            // });
+            var matchAll = document.createElement('a');
+            matchAll.href = 'javascript:{}';
+            matchAll.className = 'data-table-recon-match-similar';
+            matchAll.setAttribute('title', $.i18n('core-views/match-all-cells'));
+            liSpan.appendChild(matchAll).appendChild(document.createTextNode('\u00A0'));
+            matchAll.addEventListener('click', function(evt) {
               self._doMatchTopicToSimilarCells(candidate);
             });
 
-            $('<a href="javascript:{}">&nbsp;</a>')
-            .addClass("data-table-recon-match")
-            .attr("title", $.i18n('core-views/match-this-cell') )
-            .appendTo(liSpan).click(function(evt) {
-              self._doMatchTopicToOneCell(candidate);
+            // $('<a href="javascript:{}">&nbsp;</a>')
+            // .addClass("data-table-recon-match")
+            // .attr("title", $.i18n('core-views/match-this-cell') )
+            // .appendTo(liSpan).click(function(evt) {
+            //   self._doMatchTopicToOneCell(candidate);
+            // });
+            var matchThis = document.createElement('a');
+            matchThis.href = 'javascript:{}';
+            matchThis.className = 'data-table-recon-match';
+            matchThis.setAttribute('title', $.i18n('core-views/match-this-cell'));
+            liSpan.appendChild(matchThis).appendChild(document.createTextNode('\u00A0'));
+            matchThis.addEventListener('click', function(evt) {
+             self._doMatchTopicToOneCell(candidate); 
             });
 
-            var a = $('<a></a>')
-            .addClass("data-table-recon-topic")
-            .attr("target", "_blank")
-            .text(_.unescape(candidate.name)) // TODO: only use of _.unescape - consolidate
-            .appendTo(liSpan);
+            // var a = $('<a></a>')
+            // .addClass("data-table-recon-topic")
+            // .attr("target", "_blank")
+            // .text(_.unescape(candidate.name)) // TODO: only use of _.unescape - consolidate
+            // .appendTo(liSpan);
+            var a = document.createElement('a');
+            a.className = 'data-table-recon-topic';
+            a.setAttribute('target', '_blank');
+            a.textContent = _.unescape(candidate.name); // TODO: only use of _.unescape - consolidate
+            liSpan.appendChild(a);
 
             if ((service) && (service.view) && (service.view.url)) {
-              a.attr("href", encodeURI(service.view.url.replace("{{id}}", candidate.id)));
+              // a.attr("href", encodeURI(service.view.url.replace("{{id}}", candidate.id)));
+              a.href = encodeURI(service.view.url.replace("{{id}}", candidate.id));
             }
 
             self._previewOnHover(service, candidate, liSpan.parent(), liSpan, true);
