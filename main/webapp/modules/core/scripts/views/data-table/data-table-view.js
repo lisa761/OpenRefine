@@ -59,7 +59,6 @@ function DataTableView(div) {
   
   this._refocusPageInput = false;
 }
-var dismissBusy = function() {};
 DataTableView._extenders = [];
 
 /*
@@ -552,27 +551,19 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     $.data(this, 'scrollTimer', setTimeout(function() {
       if(positionLastElement.top <= 0 && positionLastElement.bottom >= 0) {
         console.log('Last row is partially visible in screen');
-        dismissBusy = DialogSystem.showBusy();
-        var goto = self.getPageNumberSrcolling(self._scrollTop);
-        console.log(goto + ' ' + self._scrollTop);
+        var goto = self.getPageNumberSrcolling(self._scrollTop, table);
+        // console.log(goto + ' ' + self._scrollTop);
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
       }
       
       if(positionFirstElement.top < self._headerTop + 1 && 
         positionFirstElement.bottom >= window.innerHeight) {
         console.log('First row is partially visible in screen');
-        dismissBusy = DialogSystem.showBusy();
-        var goto = self.getPageNumberSrcolling(self._scrollTop);
-        console.log(goto + ' ' + self._scrollTop);
+        var goto = self.getPageNumberSrcolling(self._scrollTop, table);
+        // console.log(goto + ' ' + self._scrollTop);
         self._onChangeGotoScrolling(self._scrollTop, goto, table);
       }
       flag = 0;
-        
-      // while(table.firstChild)
-      //   table.removeChild(table.firstChild);
-      // table.innerHTML = '<img src="images/large-spinner.gif" />)';
-      // console.log(table.parentNode.parentNode, table.parentNode, table.firstChild);
-
     }, 250));
     self._scrollTop = $(this).scrollTop();
   });
@@ -587,20 +578,28 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       }
   }
   this._sizeRowFirst = total / this._pageSize;
-  console.log(table.rows.length, this._sizeRowFirst, min);
   this._sizeRowsTotal = this._sizeRowFirst * theProject.rowModel.filtered;
   // theProject.metadata.rowCount was used for record made so that we can always keep track of total number of rows (no matter the number of records)
-  console.log(theProject.metadata.rowCount + ' ' + theProject.rowModel.total + '\n' + theProject.rowModel.rows.length + ' ' + theProject.rowModel.filtered);
   this._sizeSinglePage = this._sizeRowFirst * this._pageSize;
   document.querySelector('.data-table tbody').insertRow(0).setAttribute('class', 'first-row');
   this._headerTop = $('thead').offset().top + $('thead').height();
   this._pageStart = 0;
   this._totalSize = this._pageSize;
+  console.log(this._headerTop);
   this._adjustNextSetClasses();
-  // <image src="./images/large-spinner.gif">
 };
 
-DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition) {
+DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition, table) {
+
+  var width = 150 + 0.5 * window.innerWidth;
+  window.img = document.createElement('img');
+  img.setAttribute('src', 'images/large-spinner.gif');
+  img.style.zIndex = '10';
+  img.style.top = '55%';
+  img.style.left = width + 'px';
+  img.style.position = 'fixed';
+  table.appendChild(img);
+
   var num = Math.floor(scrollPosition / this._sizeSinglePage);
   return num;
 }
@@ -618,7 +617,6 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
     if (theProject.rowModel.mode == "record-based") {
       if($('.data-table tbody tr.record').length > 2 * this._pageSize) {
         console.log('Deleting above records');
-        // $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - $('.data-table tbody tr.record').eq(2 * this._pageSize).index())).remove();
         $('.data-table tbody tr').slice(1, $('.data-table tbody tr.record').eq(this._pageSize).index()).remove();
       }
     } else if($('.data-table tbody tr').length > 2 * this._pageSize) {
@@ -645,7 +643,7 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   console.log(this._pageStart + ' ' + this._totalSize);
 }
 
-DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom) {
+DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom, table) {
   $('.data-table tbody tr:first').css('height', heightToAddTop);
 
   document.querySelector('.data-table').insertRow();
@@ -661,18 +659,21 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
     }
   }
   console.log(heightToAddTop, heightToAddBottom, this._sizeRowsTotal, this._sizeSinglePage);
-  dismissBusy();
-  // DialogSystem.showBusy('done');
+  try {
+    table.removeChild(img);
+  } catch(err) {
+
+  }
 }
 
-DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start) {
+DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start, table) {
   console.log('adjustNextSetClassesSpeed');
   var heightToAddTop = modifiedScrollPosition;
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (modifiedScrollPosition + this._sizeSinglePage));
   $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - theProject.rowModel.rows.length).remove();
   this._pageStart = this._totalSize - this._pageSize;
 
-  this._addHeights(heightToAddTop, heightToAddBottom);
+  this._addHeights(heightToAddTop, heightToAddBottom, table);
 
   console.log(this._pageStart + ' ' + this._totalSize);
 };
@@ -741,16 +742,8 @@ DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scroll
   Refine.fetchRows(start, this._pageSize, function() {
     $('.last-row').remove();
 
-    // while(table.firstChild)
-    //   table.removeChild(table.firstChild);
-    // table.innerHTML = '<img style="height:' + scrollPosition + '" src="images/large-spinner.gif" />)';
-    // table.innerHTML = '<div bind="progressPanel" class="extend-data-preview-progress"><img style="height:' + scrollPosition + '"src="images/large-spinner.gif" /></div>';
-
-    // var row = table.insertRow();
-    // row.innerHTML = '<img style="height:' + scrollPosition + '" src="images/large-spinner.gif" />)';
-
     loadRows();
-    self._adjustNextSetClassesSpeed(modifiedScrollPosition, start);
+    self._adjustNextSetClassesSpeed(modifiedScrollPosition, start, table);
     
     if (onDone) {
       onDone();
