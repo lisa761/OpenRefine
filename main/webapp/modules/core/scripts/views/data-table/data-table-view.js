@@ -668,7 +668,10 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(modifiedScrollPosition, start, table) {
   console.log('adjustNextSetClassesSpeed');
-  var heightToAddTop = modifiedScrollPosition;
+  // var heightToAddTop = modifiedScrollPosition;
+  // var heightToAddTop = modifiedScrollPosition + (start % this._pageSize) * this._sizeRowFirst;
+  var heightToAddTop = start * this._sizeRowFirst;
+  console.log('heightToAddTop:', heightToAddTop);
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - (modifiedScrollPosition + this._sizeSinglePage));
   $('.data-table tbody tr').slice(1, $('.data-table tbody tr').length - theProject.rowModel.rows.length).remove();
   this._pageStart = this._totalSize - this._pageSize;
@@ -740,7 +743,7 @@ DataTableView.prototype._showRowsSpeed = function(modifiedScrollPosition, scroll
   this._totalSize = start +  this._pageSize;
 
   Refine.fetchRows(start, this._pageSize, function() {
-    console.log(start);
+    // console.log(start);
     $('.last-row').remove();
 
     loadRows();
@@ -756,10 +759,10 @@ DataTableView.prototype._onChangeGotoScrolling = function(scrollPosition, gotoPa
   console.log("_onChangeGotoScrolling");
   
   this._currentPageNumber = gotoPageNumber;
-  var modifiedScrollPosition = this._sizeRowFirst * (gotoPageNumber) * this._pageSize;
+  var modifiedScrollPosition = this._sizeSinglePage * gotoPageNumber;
   var row = (scrollPosition - modifiedScrollPosition) / this._sizeRowFirst;
   row += gotoPageNumber * this._pageSize;
-  console.log("row", row);
+  console.log("ROW:", row, gotoPageNumber, modifiedScrollPosition, this._sizeSinglePage);
   // this._showRowsSpeed(modifiedScrollPosition, scrollPosition, table, (gotoPageNumber) * this._pageSize);
   this._showRowsSpeed(modifiedScrollPosition, scrollPosition, table, Math.floor(row - 25));
 };
