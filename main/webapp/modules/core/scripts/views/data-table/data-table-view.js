@@ -465,7 +465,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       clearTimeout($.data(this, 'scrollTimer'));
       $.data(this, 'scrollTimer', setTimeout(function() {
         console.log("Loading goto scroll");
-        self.getPageNumberSrcolling(self._scrollTop, table);
+        self.getPageNumberScrolling(self._scrollTop, table);
         prevOperationSet = false;
       }, 250));
     }
@@ -473,7 +473,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   });
 };
 
-DataTableView.prototype.getPageNumberSrcolling = function(scrollPosition, table) {
+DataTableView.prototype.getPageNumberScrolling = function(scrollPosition, table) {
   // Loading sign
   if(document.querySelector('div#body').classList.contains('hide-left-panel'))
     var width = 0.5 * window.innerWidth;
