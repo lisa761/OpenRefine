@@ -417,9 +417,31 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   this._adjustNextSetClasses();
 
   var prevOperationSet = false;
-  $(table.parentNode.parentNode).bind('scroll', function(evt) {
-    self._downwardDirection = self._scrollTop < $(this).scrollTop();
+  window.scrollEvent = function(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt) {
+    // console.log("here");
+    if(!prevOperationSet) {
+      // console.log("Step1");
+      if(self._downwardDirection) {
+        // console.log("Step2");
+        if((positionNextSet.top >= 0 && positionNextSet.bottom <= window.innerHeight) || 
+          (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
+          console.log("Loading next set");
+          self._onBottomTable(self._scrollTop, table, table.parentNode.parentNode, evt);
+        }
+      }
+      else if(!self._downwardDirection) {
+        if(positionPrevSet.top >= 0 && positionPrevSet.bottom <= window.innerHeight || 
+          (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
+          console.log("Loading previous set");
+          self._onTopTable(self._scrollTop, table, table.parentNode.parentNode, evt);
+        }
+      }
+      prevOperationSet = true;
+    }
+  };
 
+  $(table.parentNode.parentNode).bind('scroll', function(evt) {
+    self._downwardDirection = self._scrollTop < $(table.parentNode.parentNode).scrollTop();
     try {
       var nextSet = document.querySelectorAll('.load-next-set');
       var prevSet = nextSet[0];
@@ -435,41 +457,24 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     var firstElement = document.querySelector('.first-row');
     var positionFirstElement = firstElement.getBoundingClientRect();
 
-    if(!prevOperationSet) {
-      // console.log("Step1");
-      if(self._downwardDirection) {
-        // console.log("Step2");
-        if((positionNextSet.top >= 0 && positionNextSet.bottom <= window.innerHeight) || 
-          (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
-          console.log("Loading next set");
-          self._onBottomTable(self._scrollTop, table, this, evt);
-        }
-      }
-      else if(!self._downwardDirection) {
-        if(positionPrevSet.top >= 0 && positionPrevSet.bottom <= window.innerHeight || 
-          (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
-          console.log("Loading previous set");
-          self._onTopTable(self._scrollTop, table, this, evt);
-        }
-      }
-      prevOperationSet = true;
-    }
+    scrollEvent(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
 
-    clearTimeout($.data(this, 'resetPrevOperationSet'));
-    $.data(this, 'resetPrevOperationSet', setTimeout(function() {
+    clearTimeout($.data(table.parentNode.parentNode, 'resetPrevOperationSet'));
+    $.data(table.parentNode.parentNode, 'resetPrevOperationSet', setTimeout(function() {
       console.log("here");
       prevOperationSet = false;
+      scrollEvent(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
     }, 50));
 
     if((positionLastElement.top <= 0 && positionLastElement.bottom >= 0) || (positionFirstElement.top < self._headerTop + 1 && positionFirstElement.bottom >= window.innerHeight)) {
-      clearTimeout($.data(this, 'scrollTimer'));
-      $.data(this, 'scrollTimer', setTimeout(function() {
+      clearTimeout($.data(table.parentNode.parentNode, 'scrollTimer'));
+      $.data(table.parentNode.parentNode, 'scrollTimer', setTimeout(function() {
         console.log("Loading goto scroll");
         self.getPageNumberScrolling(self._scrollTop, table);
         prevOperationSet = false;
       }, 250));
     }
-    self._scrollTop = $(this).scrollTop();
+    self._scrollTop = $(table.parentNode.parentNode).scrollTop();
   });
 };
 
