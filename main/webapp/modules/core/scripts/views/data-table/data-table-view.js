@@ -418,7 +418,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
   var prevOperationSet = false;
   window.scrollEvent = function(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt) {
-    // console.log("here");
+    console.log("scrollEvent");
     if(!prevOperationSet) {
       // console.log("Step1");
       if(self._downwardDirection) {
@@ -462,9 +462,9 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     clearTimeout($.data(table.parentNode.parentNode, 'resetPrevOperationSet'));
     $.data(table.parentNode.parentNode, 'resetPrevOperationSet', setTimeout(function() {
       console.log("here");
-      prevOperationSet = false;
-      scrollEvent(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
-    }, 50));
+      // prevOperationSet = false;
+      // scrollEvent(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
+    }, 250));
 
     if((positionLastElement.top <= 0 && positionLastElement.bottom >= 0) || (positionFirstElement.top < self._headerTop + 1 && positionFirstElement.bottom >= window.innerHeight)) {
       clearTimeout($.data(table.parentNode.parentNode, 'scrollTimer'));
