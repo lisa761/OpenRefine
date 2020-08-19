@@ -378,7 +378,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
         td.innerHTML = "&nbsp;";
       } else {
         var cell = (column.cellIndex < cells.length) ? cells[column.cellIndex] : null;
-        new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
+        // new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
       }
     }
   };
