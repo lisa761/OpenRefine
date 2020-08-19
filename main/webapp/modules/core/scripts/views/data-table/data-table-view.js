@@ -417,14 +417,14 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   this._adjustNextSetClasses();
 
   var prevOperationSet = false;
+  // This variable stores whether the previous operation was a load set for reaching bottom of table or top of table
   window.scrollEvent = function(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt) {
     console.log("scrollEvent");
     if(!prevOperationSet) {
-      // console.log("Step1");
       if(self._downwardDirection) {
-        // console.log("Step2");
         if((positionNextSet.top >= 0 && positionNextSet.bottom <= window.innerHeight) || 
           (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
+          // the comparision here checks whether the 50th row (while going downwards) or last row (one for maintaining bottom height) is partially visible on the screen (i.e. the grid is partially filled)
           console.log("Loading next set");
           self._onBottomTable(self._scrollTop, table, table.parentNode.parentNode, evt);
         }
@@ -432,11 +432,13 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
       else if(!self._downwardDirection) {
         if(positionPrevSet.top >= 0 && positionPrevSet.bottom <= window.innerHeight || 
           (positionFirstElement.bottom > 0 && positionFirstElement.bottom < window.innerHeight)) {
+          // the comparision here checks whether the 50th row (while going upwards) or first row (one for maintaining bottom height) is partially visible on the screen (i.e. the grid is partially filled)
           console.log("Loading previous set");
           self._onTopTable(self._scrollTop, table, table.parentNode.parentNode, evt);
         }
       }
       prevOperationSet = true;
+      // we set it true to limit multiple calls to the loading function due to height changes being detected as actual scrolling
     }
   };
 
@@ -461,14 +463,17 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
     clearTimeout($.data(table.parentNode.parentNode, 'resetPrevOperationSet'));
     $.data(table.parentNode.parentNode, 'resetPrevOperationSet', setTimeout(function() {
+      // timer to reset prevOperation to false so that the loading operations in the scrollEvent function can continue to execute after 250ms of a recently loaded set
       console.log("here");
-      // prevOperationSet = false;
-      // scrollEvent(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
+      prevOperationSet = false;
     }, 250));
 
     if((positionLastElement.top <= 0 && positionLastElement.bottom >= 0) || (positionFirstElement.top < self._headerTop + 1 && positionFirstElement.bottom >= window.innerHeight)) {
+      // this comparision checks whether the grid is completely empty, that is only the first row or the last row is visible
       clearTimeout($.data(table.parentNode.parentNode, 'scrollTimer'));
       $.data(table.parentNode.parentNode, 'scrollTimer', setTimeout(function() {
+        // this timer ensures that the loading of corresponding page starts only once the user has stopped scrolling
+        // it is required in order to avoid multiple loading calls which can lead to a halt in detection of scrolling because of the time taken in rendering the rows
         console.log("Loading goto scroll");
         self.getPageNumberScrolling(self._scrollTop, table);
         prevOperationSet = false;
