@@ -418,8 +418,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
   var prevOperationSet = false;
   // This variable stores whether the previous operation was a load set for reaching bottom of table or top of table
-  window.scrollEvent = function(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt) {
-    console.log("scrollEvent");
+  window.scrollEvent = function(positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt) {
     if(!prevOperationSet) {
       if(self._downwardDirection) {
         if((positionNextSet.top >= 0 && positionNextSet.bottom <= window.innerHeight) || 
@@ -427,6 +426,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
           // the comparision here checks whether the 50th row (while going downwards) or last row (one for maintaining bottom height) is partially visible on the screen (i.e. the grid is partially filled)
           console.log("Loading next set");
           self._onBottomTable(self._scrollTop, table, table.parentNode.parentNode, evt);
+          prevOperationSet = true;
         }
       }
       else if(!self._downwardDirection) {
@@ -435,9 +435,10 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
           // the comparision here checks whether the 50th row (while going upwards) or first row (one for maintaining bottom height) is partially visible on the screen (i.e. the grid is partially filled)
           console.log("Loading previous set");
           self._onTopTable(self._scrollTop, table, table.parentNode.parentNode, evt);
+          prevOperationSet = true;
         }
       }
-      prevOperationSet = true;
+      // prevOperationSet = true;
       // we set it true to limit multiple calls to the loading function due to height changes being detected as actual scrolling
     }
   };
@@ -459,14 +460,15 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     var firstElement = document.querySelector('.first-row');
     var positionFirstElement = firstElement.getBoundingClientRect();
 
-    scrollEvent(prevOperationSet, positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
+    scrollEvent(positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
 
-    clearTimeout($.data(table.parentNode.parentNode, 'resetPrevOperationSet'));
-    $.data(table.parentNode.parentNode, 'resetPrevOperationSet', setTimeout(function() {
-      // timer to reset prevOperation to false so that the loading operations in the scrollEvent function can continue to execute after 250ms of a recently loaded set
-      console.log("here");
-      prevOperationSet = false;
-    }, 250));
+    if(prevOperationSet) {
+      $.data(table.parentNode.parentNode, 'resetPrevOperationSet', setTimeout(function() {
+        // timer to reset prevOperation to false so that the loading operations in the scrollEvent function can continue to execute after 250ms of a recently loaded set
+        scrollEvent(positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
+        prevOperationSet = false;
+      }, 250));
+    }
 
     if((positionLastElement.top <= 0 && positionLastElement.bottom >= 0) || (positionFirstElement.top < self._headerTop + 1 && positionFirstElement.bottom >= window.innerHeight)) {
       // this comparision checks whether the grid is completely empty, that is only the first row or the last row is visible
