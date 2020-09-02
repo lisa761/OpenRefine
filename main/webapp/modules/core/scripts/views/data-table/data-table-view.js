@@ -312,41 +312,45 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
    *------------------------------------------------------------
    */
   var onClickStar = function(evt) {
-      var newStarred = !evt.data.row.starred;
-      Refine.postCoreProcess(
-        "annotate-one-row",
-        { row: evt.data.row.i, starred: newStarred },
-        null,
-        {},
-        {
-          onDone: function(o) {
-            row.starred = newStarred;
-            renderRow(evt.data.tr, evt.data.r, evt.data.row, evt.data.even);
-          }
-        },
-        "json"
-      );
+    console.log("here1");
+    var selectedRow = evt.currentTarget.data;
+    console.log(selectedRow);
+    var newStarred = !selectedRow.row.starred;
+    Refine.postCoreProcess(
+      "annotate-one-row",
+      { row: selectedRow.row.i, starred: newStarred },
+      null,
+      {},
+      {
+        onDone: function(o) {
+          selectedRow.row.starred = newStarred;
+          renderRow(selectedRow.tr, selectedRow.r, selectedRow.row, selectedRow.even);
+        }
+      },
+      "json"
+    );
   };
   var onClickFlag = function(evt) {
-      var newFlagged = !row.flagged;
-      Refine.postCoreProcess(
-        "annotate-one-row",
-        { row: evt.data.row.i, flagged: newFlagged },
-        null,
-        {},
-        {
-          onDone: function(o) {
-            row.flagged = newFlagged;
-            renderRow(evt.data.tr, evt.data.r, evt.data.row, evt.data.even);
-          }
-        },
-        "json"
-      );
-    };
+    console.log("here2");
+    var selectedRow = evt.currentTarget.data;
+    var newFlagged = !selectedRow.row.flagged;
+    Refine.postCoreProcess(
+      "annotate-one-row",
+      { row: selectedRow.row.i, flagged: newFlagged },
+      null,
+      {},
+      {
+        onDone: function(o) {
+          selectedRow.row.flagged = newFlagged;
+          renderRow(selectedRow.tr, selectedRow.r, selectedRow.row, selectedRow.even);
+        }
+      },
+      "json"
+    );
+  };
     
-  var renderRowTemplate = function(row) {
-    var tr = document.createElement('TR');
-    var cells = row.cells;
+  var renderRowTemplate = function() {
+    var tr = document.createElement('tr');
     
     var tdStar = tr.insertCell(-1);
     $('<a href="javascript:{}">&nbsp;</a>')
@@ -359,34 +363,12 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     .appendTo(tdFlag)
 
     var tdIndex = tr.insertCell(-1);
-    if (theProject.rowModel.mode == "record-based") {
-      if ("j" in row) {
-        $(tr).addClass("record");
-        var div = document.createElement('div');
-        div.innerHTML = (row.j + 1) + '.';
-        tdIndex.appendChild(div);
-      } else {
-        var div = document.createElement('div');
-        div.innerHTML = '\u00A0';
-        tdIndex.appendChild(div);
-      }
-    } else {
-      var div = document.createElement('div');
-      div.innerHTML = (row.i + 1) + '.';
-      tdIndex.appendChild(div);
-    }
+    var div = document.createElement('div');
+    tdIndex.appendChild(div);
 
     for (var i = 0; i < columns.length; i++) {
       var column = columns[i];
       var td = tr.insertCell(-1);
-      if (self._collapsedColumnNames.hasOwnProperty(column.name)) {
-        // TODO: handle this differently (ie more dynamically)?
-        td.innerHTML = "&nbsp;";
-      } else {
-        var cell = (column.cellIndex < cells.length) ? cells[column.cellIndex] : null;
-        // TODO: clone a template cell 
-        new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
-      }
     }
     
     return tr;
@@ -395,46 +377,48 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   var rowTemplate = renderRowTemplate();
 
   var renderRow = function(tr, r, row, even) {
-    var tr = rowTemplate.cloneNode(true);
-    var cells = row.cells;
-    
-    tr.cells[0].on('click', {tr: tr, r: r, row: row, even: even}, onClickStar);
-    if (rows.starred) {
-      tr.cells[0].removeClass("data-table-star-off").addClass("data-table-star-on");
+    var cellsRow = row.cells;
+    // console.log(row.starred);
+    tr.cells[0].data = {tr: tr, r: r, row: row, even: even};
+    tr.cells[1].data = {tr: tr, r: r, row: row, even: even};
+
+    tr.cells[0].addEventListener('click', onClickStar);
+
+    if (row.starred) {
+      var a = tr.cells[0].querySelector('a');
+      a.classList.remove("data-table-star-off");
+      a.classList.add("data-table-star-on");
     }
-    
-    tr.cells[1].on('click', {tr: tr, r: r, row: row, even: even}, onClickFlag);
-    if (rows.flagged) {
-      tr.cells[1].removeClass("data-table-flag-off").addClass("data-table-flag-on");
+
+    tr.cells[1].addEventListener('click', onClickFlag);
+    if (row.flagged) {
+      var a = tr.cells[1].querySelector('a');
+      a.classList.remove("data-table-flag-off");
+      a.classList.add("data-table-flag-on");
     }
 
     var tdIndex = tr.cells[2];
+    var div = tdIndex.querySelector('div');
     if (theProject.rowModel.mode == "record-based") {
       if ("j" in row) {
         $(tr).addClass("record");
-        var div = document.createElement('div');
         div.innerHTML = (row.j + 1) + '.';
-        tdIndex.appendChild(div);
       } else {
-        var div = document.createElement('div');
         div.innerHTML = '\u00A0';
-        tdIndex.appendChild(div);
       }
     } else {
-      var div = document.createElement('div');
       div.innerHTML = (row.i + 1) + '.';
-      tdIndex.appendChild(div);
     }
 
     $(tr).addClass(even ? "even" : "odd");
 
     for (var i = 0; i < columns.length; i++) {
       var column = columns[i];
-      var td = tr.cells[i];
+      var td = tr.cells[i + 3];
       if (self._collapsedColumnNames.hasOwnProperty(column.name)) {
         td.innerHTML = "&nbsp;";
       } else {
-        var cell = (column.cellIndex < cells.length) ? cells[column.cellIndex] : null;
+        var cell = (column.cellIndex < cellsRow.length) ? cellsRow[column.cellIndex] : null;
         // TODO: Update cell rather than replacing
         new DataTableCellUI(self, cell, row.i, column.cellIndex, td);
       }
@@ -447,7 +431,7 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
     for (var r = 0; r < rows.length; r++) {
       var row = rows[r];
       var tr = rowTemplate.cloneNode(true);
-      var tbody = table.getElementsByTagName('tbody');
+      var tbody = document.querySelector('.data-table tbody');
       if(top) {
         tbody.insertBefore(tr, tbody.children[r + 1]);
       } else {
