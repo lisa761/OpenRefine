@@ -48,6 +48,8 @@ function DataTableView(div) {
   this._downwardDirection = true;
   this._pageStart = 0;
   this._headerTop = 0;
+  this._screenSize = 0;
+  this._bigScreenSetSize = 0;
 
   this._showRows(0);
   
@@ -414,16 +416,17 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
   this._headerTop = $('thead').offset().top + $('thead').height();
   this._pageStart = 0;
   this._totalSize = this._pageSize;
+  this._screenSize = Math.ceil((window.innerHeight - this._headerTop) / this._sizeRowFirst);
+  this._bigScreenSetSize = this._pageSize * Math.round((2 * this._screenSize) / this._pageSize);
   this._adjustNextSetClasses();
 
-  var prevOperationSet = false;
+  window.prevOperationSet = false;
   // This variable stores whether the previous operation was a load set for reaching bottom of table or top of table
   window.scrollEvent = function(positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt) {
     if(!prevOperationSet) {
       if(self._downwardDirection) {
-        if((positionNextSet.top >= 0 && positionNextSet.bottom <= window.innerHeight) || 
-          (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
-          // the comparision here checks whether the 50th row (while going downwards) or last row (one for maintaining bottom height) is partially visible on the screen (i.e. the grid is partially filled)
+        if((positionNextSet.top >= self._headerTop && positionNextSet.bottom <= window.innerHeight) || (positionLastElement.top < window.innerHeight && positionLastElement.top > 0)) {
+          // the comparision here checks whether the 50th row (while going downwards) or last row (one for maintaining bottom height) is partially visible on the screen (i.e. the grid is partially filled);
           console.log("Loading next set");
           self._onBottomTable(self._scrollTop, table, table.parentNode.parentNode, evt);
           prevOperationSet = true;
@@ -462,14 +465,6 @@ DataTableView.prototype._renderDataTables = function(table, tableHeader) {
 
     scrollEvent(positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
 
-    if(prevOperationSet) {
-      $.data(table.parentNode.parentNode, 'resetPrevOperationSet', setTimeout(function() {
-        // timer to reset prevOperation to false so that the loading operations in the scrollEvent function can continue to execute after 250ms of a recently loaded set
-        scrollEvent(positionNextSet, positionLastElement, positionPrevSet, positionFirstElement, evt);
-        prevOperationSet = false;
-      }, 250));
-    }
-
     if((positionLastElement.top <= 0 && positionLastElement.bottom >= 0) || (positionFirstElement.top < self._headerTop + 1 && positionFirstElement.bottom >= window.innerHeight)) {
       // this comparision checks whether the grid is completely empty, that is only the first row or the last row is visible
       clearTimeout($.data(table.parentNode.parentNode, 'scrollTimer'));
@@ -502,27 +497,49 @@ DataTableView.prototype.getPageNumberScrolling = function(scrollPosition, table)
   this._onChangeGotoScrolling(scrollPosition, goto, table, loadingImg);
 };
 
+DataTableView.prototype._removeUpperRows = function(start) {
+  if (theProject.rowModel.mode == "record-based") {
+    if($('.data-table tbody tr.record').length > 2 * this._pageSize) {
+      $('.data-table tbody tr').slice(1, $('.data-table tbody tr.record').eq(this._pageSize).index()).remove();
+      }
+  } else if($('.data-table tbody tr').length > 2 * this._pageSize) {
+    if(this._pageSize > this._screenSize) {
+      $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
+      this._pageStart = start - this._pageSize;
+    } else {
+      // console.log("Deleting above rows");
+      this._pageStart = Math.max(0, this._totalSize - this._bigScreenSetSize);
+      var sliceIndex = $('.data-table tbody tr').length - this._bigScreenSetSize;
+      $('.data-table tbody tr').slice(1, Math.max(0, sliceIndex)).remove();
+    }
+  }
+}
+
+DataTableView.prototype._removeLowerRows = function(start) {
+  if (theProject.rowModel.mode == "record-based") {
+    $('.data-table tbody tr').slice($('.data-table tbody tr.record').eq(2 * this._pageSize).index(), $('.data-table tbody tr').length).remove();
+  } else {
+    if(this._pageSize > this._screenSize) {
+      $('.data-table tbody tr').slice(2 * this._pageSize + 1, $('.data-table tbody tr').length).remove();
+      this._pageStart = start - this._pageSize;
+    } else {
+      // console.log("Deleting below rows");
+      this._totalSize = this._pageStart + this._bigScreenSetSize;
+      $('.data-table tbody tr').slice(this._totalSize + 1).remove();
+    }
+  }
+}
+
 DataTableView.prototype._adjustNextSetClasses = function(start, top) {
   var heightToAddBottom = Math.max(0, this._sizeRowsTotal - this._totalSize * this._sizeRowFirst);
 
   if(!top) {
     // Deletion of upper rows that are not visible anymore
-    if (theProject.rowModel.mode == "record-based") {
-      if($('.data-table tbody tr.record').length > 2 * this._pageSize) {
-        $('.data-table tbody tr').slice(1, $('.data-table tbody tr.record').eq(this._pageSize).index()).remove();
-      }
-    } else if($('.data-table tbody tr').length > 2 * this._pageSize) {
-      $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
-    }
-    this._pageStart = start - this._pageSize;
+    this._removeUpperRows(start);
   } else {
     this._pageStart = start;
     // Deletion of lower rows that are not visible anymore
-    if (theProject.rowModel.mode == "record-based") {
-      $('.data-table tbody tr').slice($('.data-table tbody tr.record').eq(2 * this._pageSize).index(), $('.data-table tbody tr').length).remove();
-    } else {
-      $('.data-table tbody tr').slice(2 * this._pageSize + 1, $('.data-table tbody tr').length).remove();
-    }
+    this._removeLowerRows(start);
   }
 
   var heightToAddTop = (this._pageStart) * this._sizeRowFirst;
@@ -545,6 +562,7 @@ DataTableView.prototype._addHeights = function(heightToAddTop, heightToAddBottom
     }
   }
   if(table !== undefined) table.removeChild(loadingImg);
+  setTimeout(function() { prevOperationSet = false; }, 250);
 };
 
 DataTableView.prototype._adjustNextSetClassesSpeed = function(start, table, loadingImg) {
