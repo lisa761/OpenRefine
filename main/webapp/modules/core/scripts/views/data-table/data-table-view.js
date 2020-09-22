@@ -505,7 +505,6 @@ DataTableView.prototype._removeUpperRows = function(start) {
   } else if($('.data-table tbody tr').length > 2 * this._pageSize) {
     if(this._pageSize > this._screenSize) {
       $('.data-table tbody tr').slice(1, Math.max(0, $('.data-table tbody tr').length - 2 * this._pageSize)).remove();
-      this._pageStart = start - this._pageSize;
     } else {
       // console.log("Deleting above rows");
       this._pageStart = Math.max(0, this._totalSize - this._bigScreenSetSize);
@@ -521,7 +520,6 @@ DataTableView.prototype._removeLowerRows = function(start) {
   } else {
     if(this._pageSize > this._screenSize) {
       $('.data-table tbody tr').slice(2 * this._pageSize + 1, $('.data-table tbody tr').length).remove();
-      this._pageStart = start - this._pageSize;
     } else {
       // console.log("Deleting below rows");
       this._totalSize = this._pageStart + this._bigScreenSetSize;
@@ -535,10 +533,11 @@ DataTableView.prototype._adjustNextSetClasses = function(start, top) {
 
   if(!top) {
     // Deletion of upper rows that are not visible anymore
+    this._pageStart = start - this._pageSize;
     this._removeUpperRows(start);
   } else {
-    this._pageStart = start;
     // Deletion of lower rows that are not visible anymore
+    this._pageStart = start;
     this._removeLowerRows(start);
   }
 
